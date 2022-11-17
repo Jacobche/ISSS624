@@ -48,3 +48,29 @@ preschool = st_read("data/geospatial/pre-schools-location-kml.kml")
 ```
 
 The message reveals that there are a total of 1359 features and 2 fields in *preschool* which is in **wgs84** coordinates system.
+
+## Checking Data Content
+
+The code chunk below displays the basic information of the feature class by using [st_geometry()](https://r-spatial.github.io/sf/reference/st_geometry.html) of **sf** package.
+
+```{r}
+st_geometry(mpsz)
+```
+
+The code chunk below displays the associated attribute information in the data frame by using [glimpse()](https://dplyr.tidyverse.org/reference/glimpse.html) of [**dplyr**](https://dplyr.tidyverse.org/) package.
+
+```{r}
+glimpse(mpsz)
+```
+
+The code chunk below reveals the complete information of a feature object by using [head()](https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/head) of Base R.
+
+```{r}
+head(mpsz, n=5)  
+```
+
+## Plotting the Geospatial Data
+
+```{r}
+plot(mpsz)
+```
