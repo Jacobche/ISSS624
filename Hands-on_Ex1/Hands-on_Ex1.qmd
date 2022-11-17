@@ -5,22 +5,46 @@ editor: visual
 
 ## Overview
 
-In this hands-on exercise, I will handle geospatial data in R by using appropriate R packages such as **sf**.
+In this hands-on exercise, I will handle geospatial data in R by using appropriate R packages.
 
-## Getting Started
+## Installing & Lauching R Packages
 
-The code chunk below install and load **sf** and **tidyverse** packages into R environment.
+The code chunk below installs and loads [**sf**](https://r-spatial.github.io/sf/) and [**tidyverse**](https://tidyverse.tidyverse.org/) packages into R environment.
 
 ```{r}
 pacman::p_load(sf, tidyverse)
-
 ```
 
 ## Import Geospatial Data
 
-### Import polygon feature data
+### Import polygon feature data in shapefile format
+
+The code chunk below imports the following geospatial data into R by using [st_read()](https://r-spatial.github.io/sf/reference/st_read.html) of **sf** package and save it as a polygon feature data frame called *mpsz*.
 
 ```{r}
 mpsz = st_read(dsn = "data/geospatial", 
-                  layer = "MP14_SUBZONE_WEB_PL")
+               layer = "MP14_SUBZONE_WEB_PL")
 ```
+
+The message reveals that there are a total of 323 multipolygon features and 15 fields in *mpsz* which is in **svy21** projected coordinates system.
+
+### Import polyline feature data in shapefile format
+
+The code chunk below imports the following geospatial data into R by using [st_read()](https://r-spatial.github.io/sf/reference/st_read.html) of **sf** package and save it as a line feature data frame called *cyclingpath*.
+
+```{r}
+cyclingpath = st_read(dsn = "data/geospatial", 
+                      layer = "CyclingPath")
+```
+
+The message reveals that there are a total of 1625 features and 2 fields in *cyclingpath* which is in **svy21** projected coordinates system.
+
+### Import GIS data in kml format
+
+The code chunk below imports the following geospatial data into R by using [st_read()](https://r-spatial.github.io/sf/reference/st_read.html) of **sf** package and save it as a point feature data frame called *preschool*.
+
+```{r}
+preschool = st_read("data/geospatial/pre-schools-location-kml.kml")
+```
+
+The message reveals that there are a total of 1359 features and 2 fields in *preschool* which is in **wgs84** coordinates system.
