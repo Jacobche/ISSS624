@@ -1,0 +1,22 @@
+---
+title: "Hands-on Exercise 1"
+editor: visual
+---
+
+## Overview
+
+In this hands-on exercise, we will handle geospatial data in R by using **sf** package.
+
+## Getting Started
+
+Below are the two R packages that will be used:
+
+```{r}
+packages = c('sf', 'tidyverse')
+for (p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p,character.only = T)
+}
+```
