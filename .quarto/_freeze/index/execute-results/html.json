@@ -1,0 +1,14 @@
+{
+  "hash": "4928602c678a50d399a5ddd1c159c3c4",
+  "result": {
+    "markdown": "---\ntitle: \"ISSS624\"\n---\n\n\nWelcome to ISSS624 Geospatial Analytics Applications!\n\nIn this webpage, I am going to share with you my leaning journey of geospatial analytics.\n\n\n::: {.cell}\n\n```{.r .cell-code}\n1 + 1\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n[1] 2\n```\n:::\n:::\n\n\nWelcome to ISSS624 Geospatial Analytics Applications!\n\nIn this webpage, I am going to share with you my leaning journey of geospatial analytics.\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
