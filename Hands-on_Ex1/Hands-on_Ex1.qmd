@@ -7,7 +7,7 @@ editor: visual
 
 In this hands-on exercise, I will learn to handle geospatial data in R by using appropriate R packages.
 
-## Installing & Lauching R Packages
+## Installing & Launching R Packages
 
 The code chunk below installs and loads [**sf**](https://r-spatial.github.io/sf/) and [**tidyverse**](https://tidyverse.tidyverse.org/) packages into R environment.
 
