@@ -307,7 +307,7 @@ ggplot(data=mpsz3414, aes(x= as.numeric(`PreSch Density`), y=`PreSch Count`)) +
     geom_point() +
   labs(title = "Are Pre-school Density and Pre-school Count positively correlated ?",
       x = "Pre-school density (per km sq)",
-      y = "Pre-schook count") +
+      y = "Pre-school count") +
   xlim(0, 40) +
   ylim(0, 40)
 ```
