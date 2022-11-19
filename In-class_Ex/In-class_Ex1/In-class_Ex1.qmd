@@ -1,0 +1,36 @@
+---
+title: "In-class Exercise 1"
+editor: visual
+---
+
+## Overview
+
+In this in-class exercise, I will learn to compute spatial weights using R.
+
+## Installing & Loading R Packages
+
+The code chunk below installs and loads tidyverse and sf packages into R environment.
+
+```{r}
+pacman::p_load(sf, tidyverse)
+```
+
+## Import Geospatial Data
+
+### Import polygon features
+
+This code chunk will import ESRI shapefile into R.
+
+(Since data file is in the Hands-on Exercise folder, we retrieve the data from the root this time.)
+
+```{r}
+mpsz = st_read(dsn = "C:/Jacobche/ISSS624/Hands-on_Ex/Hands-on_Ex1/data/geospatial", 
+               layer = "MP14_SUBZONE_WEB_PL")
+```
+
+### Import and transform into projected coordinates system
+
+```{r}
+preschool = st_read("C:/Jacobche/ISSS624/Hands-on_Ex/Hands-on_Ex1/data/geospatial/pre-schools-location-kml.kml") %>%
+  st_transform(crs = 3414)
+```
