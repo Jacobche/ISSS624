@@ -4,6 +4,7 @@ project:
 website:
   title: "ISSS624"
   navbar:
+    background: aquamarine
     left: 
       - text: Hands-on Exercise
         menu: 
