@@ -1,9 +1,26 @@
 ---
 title: "About"
+about:
+  id: hero-heading
+  template: trestles
+  image: images/dp.jpg
+  image-shape: rounded
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/jacob-che-xuan-b646a9123/
 ---
 
-About this site
+# `Jacob Che Xuan`
 
-```{r}
-1 + 1
-```
+::: {#hero-heading}
+-   Data Analyst with more than 6 years of experience
+
+-   Currently pursuing a Master's Degree with SMU
+
+-   Experience in Digital Transformation, Data Warehousing, Data Analytics & Data Visualizations
+
+-   Fluent in English & Chinese
+:::
+
+### 
