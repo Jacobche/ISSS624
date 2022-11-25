@@ -257,5 +257,26 @@
     "title": "Take-home Exercise 1: Geospatial Analytics for Social Good",
     "section": "Overview",
     "text": "Overview\nGeospatial analytics hold tremendous potential to address complex problems faced by society. In this study, we are tasked to apply appropriate global and local measures of spatial association techniques to reveals the spatial patterns of non-functional water points. For the purpose of this study, Nigeria will be used as the study country."
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex1.html#installing-loading-r-packages",
+    "href": "Take-home_Ex/Take-home_Ex1.html#installing-loading-r-packages",
+    "title": "Take-home Exercise 1: Geospatial Analytics for Social Good",
+    "section": "Installing & Loading R Packages",
+    "text": "Installing & Loading R Packages\nThe code chunk below installs and loads the required packages into R environment.\n\npacman::p_load(sf, spdep, tmap, tidyverse)"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex1.html#getting-the-data-into-r-environment",
+    "href": "Take-home_Ex/Take-home_Ex1.html#getting-the-data-into-r-environment",
+    "title": "Take-home Exercise 1: Geospatial Analytics for Social Good",
+    "section": "Getting the Data Into R Environment",
+    "text": "Getting the Data Into R Environment\n\nImport Aspatial Data\nFor the purpose of this exercise, data of WPdx+ version from WPdx Global Data Repositories will be used.\nThe code chunk below imports Water_Point_Data_Exchange_-_Plus__WPdx__.csv from the rawdata folder into R by using read_csv() of readr package and save it as tibble data frame called wpdx.\n\nwpdx <- read_csv(\"rawdata/aspatial/Water_Point_Data_Exchange_-_Plus__WPdx__.csv\")\n\n\n\nImport Geospatial Data\nNigeria Level-2 Administrative Boundary (also known as Local Government Area) polygon features GIS data will be used in this exercise. The data can be downloaded either from The Humanitarian Data Exchange portal or geoBoundaries.\nThe code chunk below uses st_read() of sf package to import nga_polnda_adm2_1m_salb shapefile into R environement. The imported shapefile will be a simple features object of sf.\n\nnga <- st_read(dsn = \"data/geospatial\",\n                 layer = \"nga_polbndl_adm2_1m_salb\")\n\nReading layer `nga_polbndl_adm2_1m_salb' from data source \n  `C:\\Jacobche\\ISSS624\\Take-home_Ex\\data\\geospatial' using driver `ESRI Shapefile'\nSimple feature collection with 1685 features and 1 field\nGeometry type: LINESTRING\nDimension:     XY\nBounding box:  xmin: 2.744192 ymin: 4.363015 xmax: 14.57926 ymax: 13.90103\nGeodetic CRS:  WGS 84\n\n\n\nnga2 <- st_read(dsn = \"data/geospatial\",\n                 layer = \"nga_polnda_adm2_1m_salb\")\n\nReading layer `nga_polnda_adm2_1m_salb' from data source \n  `C:\\Jacobche\\ISSS624\\Take-home_Ex\\data\\geospatial' using driver `ESRI Shapefile'\nSimple feature collection with 773 features and 12 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2.668432 ymin: 4.277144 xmax: 14.67808 ymax: 13.90103\nGeodetic CRS:  WGS 84\n\n\n\n\nPerforming relational join\nThe code chunk below will be used to update the attribute table of hunan’s SpatialPolygonsDataFrame with the attribute fields of hunan2012 data frame. This is performed by using left_join() of dplyr package.\nTBC"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex1.html#data-wranging",
+    "href": "Take-home_Ex/Take-home_Ex1.html#data-wranging",
+    "title": "Take-home Exercise 1: Geospatial Analytics for Social Good",
+    "section": "Data Wranging",
+    "text": "Data Wranging\nWe will filter the wpdx data to be for Nigeria only and aggregate the water point count at LGA level.\n\nnigeria_wp <- wpdx %>%\n  filter(`#country_name` == 'Nigeria') %>%\n  group_by(`#country_name`, `#adm2`) %>%\n    summarise(count = n()) %>%\n  rename(country = `#country_name`) %>%\n  rename(adm2 = `#adm2`)\n\nData frames nigeria_wp is saved in RDS format to avoid uploading large files to Git.\n\nsaveRDS(nigeria_wp, 'data/rds/nigeria_wp.rds')\n\n\nnigeria_wp <- readRDS('data/rds/nigeria_wp.rds')"
   }
 ]

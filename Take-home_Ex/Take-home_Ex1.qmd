@@ -28,3 +28,68 @@ The specific tasks of this take-home exercise are as follows:
 ## Overview
 
 Geospatial analytics hold tremendous potential to address complex problems faced by society. In this study, we are tasked to apply appropriate global and local measures of spatial association techniques to reveals the spatial patterns of non-functional water points. For the purpose of this study, Nigeria will be used as the study country.
+
+## Installing & Loading R Packages
+
+The code chunk below installs and loads the required packages into R environment.
+
+```{r}
+pacman::p_load(sf, spdep, tmap, tidyverse)
+```
+
+## Getting the Data Into R Environment
+
+### Import Aspatial Data
+
+For the purpose of this exercise, data of WPdx+ version from [WPdx Global Data Repositories](https://www.waterpointdata.org/access-data/) will be used.
+
+The code chunk below imports `Water_Point_Data_Exchange_-_Plus__WPdx__.csv` from the rawdata folder into R by using [*read_csv()*](https://readr.tidyverse.org/reference/read_delim.html) of [**readr**](https://readr.tidyverse.org/) package and save it as tibble data frame called `wpdx`.
+
+```{r eval=FALSE}
+wpdx <- read_csv("rawdata/aspatial/Water_Point_Data_Exchange_-_Plus__WPdx__.csv")
+```
+
+### Import Geospatial Data
+
+Nigeria Level-2 Administrative Boundary (also known as Local Government Area) polygon features GIS data will be used in this exercise. The data can be downloaded either from The [Humanitarian Data Exchange](https://data.humdata.org/) portal or [geoBoundaries](https://www.geoboundaries.org/).
+
+The code chunk below uses [*st_read()*](https://r-spatial.github.io/sf/reference/st_read.html) of [**sf**](https://r-spatial.github.io/sf/) package to import `nga_polnda_adm2_1m_salb` shapefile into R environement. The imported shapefile will be a simple features object of **sf**.
+
+```{r}
+nga <- st_read(dsn = "data/geospatial",
+                 layer = "nga_polbndl_adm2_1m_salb")
+```
+
+```{r}
+nga2 <- st_read(dsn = "data/geospatial",
+                 layer = "nga_polnda_adm2_1m_salb")
+```
+
+### Performing relational join
+
+The code chunk below will be used to update the attribute table of `hunan`'s SpatialPolygonsDataFrame with the attribute fields of `hunan2012` data frame. This is performed by using *left_join()* of **dplyr** package.
+
+TBC
+
+## Data Wranging
+
+We will filter the `wpdx` data to be for Nigeria only and aggregate the water point count at LGA level.
+
+```{r eval=FALSE}
+nigeria_wp <- wpdx %>%
+  filter(`#country_name` == 'Nigeria') %>%
+  group_by(`#country_name`, `#adm2`) %>%
+    summarise(count = n()) %>%
+  rename(country = `#country_name`) %>%
+  rename(adm2 = `#adm2`)
+```
+
+Data frames `nigeria_wp` is saved in RDS format to avoid uploading large files to Git.
+
+```{r eval=FALSE}
+saveRDS(nigeria_wp, 'data/rds/nigeria_wp.rds')
+```
+
+```{r}
+nigeria_wp <- readRDS('data/rds/nigeria_wp.rds')
+```
