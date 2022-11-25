@@ -742,8 +742,3 @@ tmap_arrange(gdppc,
 ```
 
 In the Gi map above, counties shaded in red are the hot spot areas and counties shaded in blue are the cold spot areas. The darkness of the colours representing the intensity of the Gi values.
-
-
-
-
-

@@ -1,0 +1,30 @@
+---
+title: "Take-home Exercise 1: Geospatial Analytics for Social Good"
+editor: visual
+---
+
+## The Task
+
+The specific tasks of this take-home exercise are as follows:
+
+-   Using appropriate **sf** method, import the shapefile into R and save it in a simple feature data frame format. Note that there are three Projected Coordinate Systems of Nigeria, they are: EPSG: 26391, 26392, and 26303. We can use any one of them.
+
+-   Using appropriate **tidyr** and **dplyr** methods, derive the proportion of functional and non-functional water point at LGA level.
+
+-   Combining the geospatial and aspatial data frame into simple feature data frame.
+
+-   Performing outliers/clusters analysis by using appropriate local measures of spatial association methods.
+
+-   Performing hotspot areas analysis by using appropriate local measures of spatial association methods.
+
+### Thematic Mapping
+
+-   Plot maps to show the spatial distribution of functional and non-functional water point rate at Local Government Area (LGA) level by using appropriate thematic mapping technique provided by **tmap** package.
+
+### Analytical Mapping
+
+-   Plot hotspot areas and outliers/clusters maps of functional and non-functional water point rate at LGA level by using appropriate thematic mapping technique provided by **tmap** package.
+
+## Overview
+
+Geospatial analytics hold tremendous potential to address complex problems faced by society. In this study, we are tasked to apply appropriate global and local measures of spatial association techniques to reveals the spatial patterns of non-functional water points. For the purpose of this study, Nigeria will be used as the study country.
