@@ -123,6 +123,8 @@ tmap_arrange(equal,
              ncol=2)
 ```
 
+From the maps above, we can see that data classification methods do matter. When using Equal Quantile Classification, those areas having lesser distribution as seen in Equal Interval Classification may non be that significant anymore.
+
 ## Global Spatial Autocorrelation
 
 In this section, we will learn to compute global spatial autocorrelation statistics and to perform spatial complete randomness test for global spatial autocorrelation.
@@ -191,7 +193,7 @@ bperm= moran.mc(hunan$GDPPC,
 bperm
 ```
 
-From the Monte Carlo simulation since the p-value = 0.001, we can reject the null hypothesis at 99% confidence level and can conclude that the distribution of GDPPC values in the counties are not randomly distributed. As the Moran I statistic = 0.30075 \> 0, we can infer that the spatial pattern is "clustered".
+From the Monte Carlo simulation since the p-value = 0.001, we can reject the null hypothesis at 99% confidence interval and can conclude that the distribution of GDPPC values in the counties are not randomly distributed. As the Moran I statistic = 0.30075 \> 0, we can infer that the spatial pattern is "clustered".
 
 #### Visualising Monte Carlo Moran's I
 
@@ -218,7 +220,7 @@ abline(v=0,
        col="red") 
 ```
 
-It seems that the distribution behind the simulated Moran's I test statistics is close to normal.
+From the result, we can see a positive autocorrelation as Moran's I statistic (0.300749970) is on the right side of the distribution in simulated Moran's I.
 
 The code chunk below uses **ggplot2** to visualise the data.
 
@@ -227,7 +229,7 @@ ggplot(data = as.data.frame(bperm$res), aes(x = bperm$res)) +
   geom_histogram(bins=20, 
                  color="black", 
                  fill="light blue") +
-  labs(title = "Is the data normally distributed?",
+  labs(title = "Is there a positive autocorrelation?",
       x = "Simulated Moran's ",
       y = "Frequency") +
   geom_vline(data = as.data.frame(bperm$res), aes(xintercept=0), color="red", size=1, linetype="longdash")
@@ -245,7 +247,7 @@ The code chunk below performs Geary's C test for spatial autocorrelation by usin
 geary.test(hunan$GDPPC, listw=rswm_q)
 ```
 
-From the Geary's C test since the p-value = 0.0001526, we can reject the null hypothesis at 99% confidence level and can conclude that the distribution of GDPPC values in the counties are not randomly distributed. As the Geary C statistic = 0.6907223 \< 1, we can infer that the spatial pattern is "clustered".
+From the Geary's C test since the p-value = 0.0001526, we can reject the null hypothesis at 99% confidence interval and can conclude that the distribution of GDPPC values in the counties are not randomly distributed. As the Geary C statistic = 0.6907223 \< 1, we can infer that the spatial pattern is "clustered".
 
 #### Computing Monte Carlo Geary's C
 
@@ -259,7 +261,7 @@ bperm=geary.mc(hunan$GDPPC,
 bperm
 ```
 
-From the Monte Carlo simulation since the p-value = 0.001, we can reject the null hypothesis at 99% confidence level and can conclude that the distribution of GDPPC values in the counties are not randomly distributed. As the Geary C statistic = 0.69072 \< 1, we can infer that the spatial pattern is "clustered".
+From the Monte Carlo simulation since the p-value = 0.001, we can reject the null hypothesis at 99% confidence interval and can conclude that the distribution of GDPPC values in the counties are not randomly distributed. As the Geary C statistic = 0.69072 \< 1, we can infer that the spatial pattern is "clustered".
 
 #### Visualising the Monte Carlo Geary's C
 
@@ -282,7 +284,7 @@ hist(bperm$res, freq=TRUE, breaks=20, xlab="Simulated Geary c")
 abline(v=1, col="red") 
 ```
 
-It seems that the distribution behind the simulated Geary's C test statistics is close to normal. It is in fact closer to a normal distribution than that of simulated Moran's I test statistics.
+From the result, we can see a negative autocorrelation as Geary's C statistic (0.690722) is on the left side of the distribution in simulated Geary's C.
 
 ## Spatial Correlogram
 
@@ -306,6 +308,8 @@ By plotting the output might not allow us to provide the complete interpretation
 ```{r}
 print(MI_corr)
 ```
+
+From the result, we can infer that lag 1 and lag 2 having a positive autocorrelation while lag 5 and lag 6 having a negative autocorrelation.
 
 ### Compute Geary's C correlogram and plot
 
@@ -557,7 +561,7 @@ LISAmap <- tm_shape(hunan.localMI) +
 tmap_arrange(gdppc, LISAmap, asp=1, ncol=2)
 ```
 
-We can see that from the LISA map that there's a high-high cluster indicating positive autocorrelation for the subzone/county areas having adjacent high GDPPC values. There is also a low-high cluster indicating negative autocorrelation/outliers whereby those areas with low GDPPC values are surrounded by high GDPPC areas.
+We can see from the LISA map that there's a high-high cluster indicating positive autocorrelation for the subzone/county areas having adjacent high GDPPC values. There is also a low-high cluster indicating negative autocorrelation/outliers whereby those areas with low GDPPC values are surrounded by high GDPPC areas.
 
 ## Hot Spot and Cold Spot Area Analysis
 
@@ -706,7 +710,7 @@ tmap_arrange(gdppc, Gimap, asp=1, ncol=2)
 
 In the choropleth map above with Local Gi, counties shaded in red are the hot spot areas and counties shaded in blue are the cold spot areas. The darkness of the colours representing the intensity of the Gi values.
 
-There is a clear sign of East-West divide in the GDP per capita by county of Hunan province in 2012. The hot spot areas were centre around Changsha city at the East of the provice. The cold spot areas, on the other hand, mainly comprise of counties located on the Western part of the province centre around the forested Shaoyang prefecture city.
+There is a clear sign of East-West divide in the GDP per capita by county of Hunan province in 2012. The hot spot areas were centered around Changsha city at the East of the province. The cold spot areas, on the other hand, mainly comprise of counties located on the Western part of the province centre around the forested Shaoyang prefecture city.
 
 ### Gi statistics using adaptive distance
 
@@ -741,4 +745,4 @@ tmap_arrange(gdppc,
              ncol=2)
 ```
 
-In the Gi map above, counties shaded in red are the hot spot areas and counties shaded in blue are the cold spot areas. The darkness of the colours representing the intensity of the Gi values.
+In the Gi map above, counties shaded in red are the hot spot areas and counties shaded in blue are the cold spot areas. The darkness of the colours representing the intensity of the Gi values. The adaptive distance method still shows us a clear sign of East-West divide in the GDP per capita by county of Hunan province in 2012, even though neighbouring distance weights may be considered to be more balanced in this case.

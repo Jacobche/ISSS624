@@ -166,6 +166,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex1/In-class_Ex1.html">
  <span class="dropdown-text">In-class Exercise 1</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex2.html">
+ <span class="dropdown-text">In-class Exercise 2</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
@@ -402,6 +406,7 @@ dbl (27): avg_wage, deposite, FAI, Gov_Rev, Gov_Exp, GDP, GDPPC, GIO, Loan, ...
 <p><img src="Hands-on_Ex2_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>From the maps above, we can see that data classification methods do matter. When using Equal Quantile Classification, those areas having lesser distribution as seen in Equal Interval Classification may non be that significant anymore.</p>
 </section>
 </section>
 <section id="global-spatial-autocorrelation" class="level2">
@@ -512,7 +517,7 @@ statistic = 0.30075, observed rank = 1000, p-value = 0.001
 alternative hypothesis: greater</code></pre>
 </div>
 </div>
-<p>From the Monte Carlo simulation since the p-value = 0.001, we can reject the null hypothesis at 99% confidence level and can conclude that the distribution of GDPPC values in the counties are not randomly distributed. As the Moran I statistic = 0.30075 &gt; 0, we can infer that the spatial pattern is “clustered”.</p>
+<p>From the Monte Carlo simulation since the p-value = 0.001, we can reject the null hypothesis at 99% confidence interval and can conclude that the distribution of GDPPC values in the counties are not randomly distributed. As the Moran I statistic = 0.30075 &gt; 0, we can infer that the spatial pattern is “clustered”.</p>
 </section>
 <section id="visualising-monte-carlo-morans-i" class="level4">
 <h4 class="anchored" data-anchor-id="visualising-monte-carlo-morans-i">Visualising Monte Carlo Moran’s I</h4>
@@ -547,14 +552,14 @@ alternative hypothesis: greater</code></pre>
 <p><img src="Hands-on_Ex2_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>It seems that the distribution behind the simulated Moran’s I test statistics is close to normal.</p>
+<p>From the result, we can see a positive autocorrelation as Moran’s I statistic (0.300749970) is on the right side of the distribution in simulated Moran’s I.</p>
 <p>The code chunk below uses <strong>ggplot2</strong> to visualise the data.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> <span class="fu">as.data.frame</span>(bperm<span class="sc">$</span>res), <span class="fu">aes</span>(<span class="at">x =</span> bperm<span class="sc">$</span>res)) <span class="sc">+</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins=</span><span class="dv">20</span>, </span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color=</span><span class="st">"black"</span>, </span>
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fill=</span><span class="st">"light blue"</span>) <span class="sc">+</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Is the data normally distributed?"</span>,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Is there a positive autocorrelation?"</span>,</span>
 <span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Simulated Moran's "</span>,</span>
 <span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Frequency"</span>) <span class="sc">+</span></span>
 <span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">data =</span> <span class="fu">as.data.frame</span>(bperm<span class="sc">$</span>res), <span class="fu">aes</span>(<span class="at">xintercept=</span><span class="dv">0</span>), <span class="at">color=</span><span class="st">"red"</span>, <span class="at">size=</span><span class="dv">1</span>, <span class="at">linetype=</span><span class="st">"longdash"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -590,7 +595,7 @@ Geary C statistic       Expectation          Variance
         0.6907223         1.0000000         0.0073364 </code></pre>
 </div>
 </div>
-<p>From the Geary’s C test since the p-value = 0.0001526, we can reject the null hypothesis at 99% confidence level and can conclude that the distribution of GDPPC values in the counties are not randomly distributed. As the Geary C statistic = 0.6907223 &lt; 1, we can infer that the spatial pattern is “clustered”.</p>
+<p>From the Geary’s C test since the p-value = 0.0001526, we can reject the null hypothesis at 99% confidence interval and can conclude that the distribution of GDPPC values in the counties are not randomly distributed. As the Geary C statistic = 0.6907223 &lt; 1, we can infer that the spatial pattern is “clustered”.</p>
 </section>
 <section id="computing-monte-carlo-gearys-c" class="level4">
 <h4 class="anchored" data-anchor-id="computing-monte-carlo-gearys-c">Computing Monte Carlo Geary’s C</h4>
@@ -613,7 +618,7 @@ statistic = 0.69072, observed rank = 1, p-value = 0.001
 alternative hypothesis: greater</code></pre>
 </div>
 </div>
-<p>From the Monte Carlo simulation since the p-value = 0.001, we can reject the null hypothesis at 99% confidence level and can conclude that the distribution of GDPPC values in the counties are not randomly distributed. As the Geary C statistic = 0.69072 &lt; 1, we can infer that the spatial pattern is “clustered”.</p>
+<p>From the Monte Carlo simulation since the p-value = 0.001, we can reject the null hypothesis at 99% confidence interval and can conclude that the distribution of GDPPC values in the counties are not randomly distributed. As the Geary C statistic = 0.69072 &lt; 1, we can infer that the spatial pattern is “clustered”.</p>
 </section>
 <section id="visualising-the-monte-carlo-gearys-c" class="level4">
 <h4 class="anchored" data-anchor-id="visualising-the-monte-carlo-gearys-c">Visualising the Monte Carlo Geary’s C</h4>
@@ -644,7 +649,7 @@ alternative hypothesis: greater</code></pre>
 <p><img src="Hands-on_Ex2_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>It seems that the distribution behind the simulated Geary’s C test statistics is close to normal. It is in fact closer to a normal distribution than that of simulated Moran’s I test statistics.</p>
+<p>From the result, we can see a negative autocorrelation as Geary’s C statistic (0.690722) is on the left side of the distribution in simulated Geary’s C.</p>
 </section>
 </section>
 </section>
@@ -682,6 +687,7 @@ method: Moran's I
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
+<p>From the result, we can infer that lag 1 and lag 2 having a positive autocorrelation while lag 5 and lag 6 having a negative autocorrelation.</p>
 </section>
 <section id="compute-gearys-c-correlogram-and-plot" class="level3">
 <h3 class="anchored" data-anchor-id="compute-gearys-c-correlogram-and-plot">Compute Geary’s C correlogram and plot</h3>
@@ -1033,7 +1039,7 @@ Zixing        -7.6849e-01 -8.8210e-02  9.4057e-01 -7.0144e-01         0.4830</co
 <p><img src="Hands-on_Ex2_files/figure-html/unnamed-chunk-42-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>We can see that from the LISA map that there’s a high-high cluster indicating positive autocorrelation for the subzone/county areas having adjacent high GDPPC values. There is also a low-high cluster indicating negative autocorrelation/outliers whereby those areas with low GDPPC values are surrounded by high GDPPC areas.</p>
+<p>We can see from the LISA map that there’s a high-high cluster indicating positive autocorrelation for the subzone/county areas having adjacent high GDPPC values. There is also a low-high cluster indicating negative autocorrelation/outliers whereby those areas with low GDPPC values are surrounded by high GDPPC areas.</p>
 </section>
 </section>
 <section id="hot-spot-and-cold-spot-area-analysis" class="level2">
@@ -1256,7 +1262,7 @@ attr(,"class")
 </div>
 </div>
 <p>In the choropleth map above with Local Gi, counties shaded in red are the hot spot areas and counties shaded in blue are the cold spot areas. The darkness of the colours representing the intensity of the Gi values.</p>
-<p>There is a clear sign of East-West divide in the GDP per capita by county of Hunan province in 2012. The hot spot areas were centre around Changsha city at the East of the provice. The cold spot areas, on the other hand, mainly comprise of counties located on the Western part of the province centre around the forested Shaoyang prefecture city.</p>
+<p>There is a clear sign of East-West divide in the GDP per capita by county of Hunan province in 2012. The hot spot areas were centered around Changsha city at the East of the province. The cold spot areas, on the other hand, mainly comprise of counties located on the Western part of the province centre around the forested Shaoyang prefecture city.</p>
 </section>
 <section id="gi-statistics-using-adaptive-distance" class="level3">
 <h3 class="anchored" data-anchor-id="gi-statistics-using-adaptive-distance">Gi statistics using adaptive distance</h3>
@@ -1293,7 +1299,7 @@ attr(,"class")
 <p><img src="Hands-on_Ex2_files/figure-html/unnamed-chunk-55-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>In the Gi map above, counties shaded in red are the hot spot areas and counties shaded in blue are the cold spot areas. The darkness of the colours representing the intensity of the Gi values.</p>
+<p>In the Gi map above, counties shaded in red are the hot spot areas and counties shaded in blue are the cold spot areas. The darkness of the colours representing the intensity of the Gi values. The adaptive distance method still shows us a clear sign of East-West divide in the GDP per capita by county of Hunan province in 2012, even though neighbouring distance weights may be considered to be more balanced in this case.</p>
 
 
 </section>
