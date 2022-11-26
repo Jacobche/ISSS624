@@ -34,7 +34,7 @@ In this in-class exercise, two geospatial data sets will be used, they:
 
 -   `geo_export`
 
--   `geoBoundaries-NGA-ADM2`
+-   `nga_admbnda_adm2_osgof_20190417`
 
 ### Importing water point geospatial data
 
@@ -70,13 +70,13 @@ Now, we are going to import the Local Government Area (LGA) boundary data into R
 
 ```{r}
 nga <- st_read(dsn = "data",
-               layer = "geoBoundaries-NGA-ADM2",
+               layer = "nga_admbnda_adm2_osgof_20190417",
                crs = 4326)
 ```
 
 Thing to learn from the code chunk above.
 
--   *st_read()* of **sf** package is used to import `geoBoundaries-NGA-ADM2` shapefile into R environment and save the imported geospatial data into simple feature data table.
+-   *st_read()* of **sf** package is used to import `nga_admbnda_adm2_osgof_20190417` shapefile into R environment and save the imported geospatial data into simple feature data table.
 
 ## Data Wrangling
 
@@ -179,14 +179,14 @@ The code chunk below computes the proportion of functional and non-functional wa
 nga_wp <- nga_wp %>%
   mutate(pct_functional = `wpt functional`/`total wpt`) %>%
   mutate(`pct_non-functional` = `wpt non-functional`/`total wpt`) %>%
-  select(1:2, 6:12)
+  select(3:4, 9:10, 18:23)
 ```
 
 Things to learn from the code chunk above:
 
 -   *mutate()* of **dplyr** package is used to derive two fields namely `pct_functional` and `pct_non-functional`.
 
--   to keep the file size small, *select()* of **dplyr** is used to retain only field 1, 2, 6, 7, 8, 9, 10, 11 and 12.
+-   to keep the file size small, *select()* of **dplyr** is used to retain only fields 3, 4, 9, 10, 18, 19, 20, 21, 22 and 23.
 
 Now, we have the tidy sf data table for subsequent analysis. We will save the sf data table into rds format.
 
