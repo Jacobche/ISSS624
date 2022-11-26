@@ -5,7 +5,7 @@ editor: visual
 
 ## Overview
 
-In this hands-on exercise, wewill learn to compute Global and Local Measure of Spatial Autocorrelation (GLSA) by using **spdep** package. By the end of this exercise, we will be able to:
+In this hands-on exercise, we will learn to compute Global and Local Measure of Spatial Autocorrelation (GLSA) by using **spdep** package. By the end of this exercise, we will be able to:
 
 -   import geospatial data using appropriate function(s) of **sf** package
 
@@ -175,7 +175,7 @@ moran.test(hunan$GDPPC,
            na.action=na.omit)
 ```
 
-From the Moran's I test since the p-value = 1.095e-06, we can reject the null hypothesis at 99% confidence level and can conclude that the distribution of GDPPC values in the counties are not randomly distributed. As the Moran I statistic = 0.300749970 \> 0, we can infer that the spatial pattern is "clustered".
+From the Moran's I test since the p-value = 1.095e-06, we can reject the null hypothesis at 99% confidence interval and can conclude that the distribution of GDPPC values in the counties are not randomly distributed. As the Moran I statistic = 0.300749970 \> 0, we can infer that the spatial pattern is "clustered".
 
 #### Computing Monte Carlo Moran's I
 
@@ -490,8 +490,8 @@ These four command lines define the high-high, low-low, low-high and high-low ca
 
 ```{r}
 quadrant[DV >0 & C_mI>0] <- 4      
-quadrant[DV <0 & C_mI<0] <- 1      
-quadrant[DV <0 & C_mI>0] <- 2
+quadrant[DV <0 & C_mI<0] <- 2      
+quadrant[DV <0 & C_mI>0] <- 1
 quadrant[DV >0 & C_mI<0] <- 3
 ```
 
@@ -509,8 +509,8 @@ DV <- hunan$GDPPC - mean(hunan$GDPPC)
 C_mI <- localMI[,1] - mean(localMI[,1])    
 signif <- 0.05       
 quadrant[DV >0 & C_mI>0] <- 4      
-quadrant[DV <0 & C_mI<0] <- 1      
-quadrant[DV <0 & C_mI>0] <- 2
+quadrant[DV <0 & C_mI<0] <- 2      
+quadrant[DV <0 & C_mI>0] <- 1
 quadrant[DV >0 & C_mI<0] <- 3
 quadrant[localMI[,5]>signif] <- 0
 ```

@@ -34,7 +34,7 @@ Geospatial analytics hold tremendous potential to address complex problems faced
 The code chunk below installs and loads the required packages into R environment.
 
 ```{r}
-pacman::p_load(sf, spdep, tmap, tidyverse)
+pacman::p_load(sf, tidyverse, tmap, spdep, funModeling)
 ```
 
 ## Getting the Data Into R Environment
@@ -55,12 +55,12 @@ Nigeria Level-2 Administrative Boundary (also known as Local Government Area) po
 
 The code chunk below uses [*st_read()*](https://r-spatial.github.io/sf/reference/st_read.html) of [**sf**](https://r-spatial.github.io/sf/) package to import `nga_polnda_adm2_1m_salb` shapefile into R environement. The imported shapefile will be a simple features object of **sf**.
 
-```{r}
+```{r eval=FALSE}
 nga <- st_read(dsn = "data/geospatial",
                  layer = "nga_polbndl_adm2_1m_salb")
 ```
 
-```{r}
+```{r eval=FALSE}
 nga2 <- st_read(dsn = "data/geospatial",
                  layer = "nga_polnda_adm2_1m_salb")
 ```
@@ -90,6 +90,6 @@ Data frames `nigeria_wp` is saved in RDS format to avoid uploading large files t
 saveRDS(nigeria_wp, 'data/rds/nigeria_wp.rds')
 ```
 
-```{r}
+```{r eval=FALSE}
 nigeria_wp <- readRDS('data/rds/nigeria_wp.rds')
 ```

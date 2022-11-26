@@ -1,0 +1,61 @@
+---
+title: "In-class_Exercise 2"
+execute: 
+  warning: false
+  message: false
+editor: visual
+---
+
+## Overview
+
+In this exercise, we are to find out if functionally similar water points positively co-occur in Nigeria.
+
+## Getting Started
+
+In the code chunk below, *p_load()* of **pacman** package is used to install and load the following R packages into R environment:
+
+-   **sf**
+
+-   **tidyverse**
+
+-   **tmap**
+
+-   **spdep**
+
+-   **funModeling**, to be used for rapid Exploratory Data Analysis
+
+```{r}
+pacman::p_load(sf, tidyverse, tmap, spdep, funModeling)
+```
+
+## Import Data
+
+change file name
+
+-   geo_export (from the 4 shapefile data)
+
+-   nga_admbnda_adm2_osgof_20190417
+
+### Import water point geospatial data
+
+The code chunk below uses...
+
+```{r}
+# eval: false
+wp <- st_read(dsn = "rawdata",
+              layer = "geo_export",
+              crs = 4326) %>%
+  filter(clean_coun == "Nigeria")
+```
+
+The code chunk below uses *write_rds()* of **readr** package...
+
+```{r}
+# eval: false
+wp_nga <- write_rds(wp,
+                    "rawdata/wp_nga.rds")
+```
+
+wpt_functional is a simple feature data table since wp_nga is a simple feature data table
+
+remember to create the proportion! just divide the total will do.
