@@ -230,7 +230,7 @@ write_rds(nga_wp, "C:/Jacobche/ISSS624/In-class_Ex/data/nga_wp.rds")
 
 ## Visualising the spatial distribution of water points
 
-The code below uses *qtm()* of **tmap** package to plot side-by-side choropleth maps showing various water points distribution by LGA levels in Nigeria.
+The code below uses *qtm()* of **tmap** package to plot side-by-side choropleth maps showing the spatial water points distribution by LGA levels in Nigeria.
 
 ```{r}
 nga_wp <- read_rds("C:/Jacobche/ISSS624/In-class_Ex/data/nga_wp.rds")
@@ -245,3 +245,25 @@ unknown <- qtm(nga_wp, "wpt unknown")+
 
 tmap_arrange(total, wp_functional, wp_nonfunctional, unknown, nrow=2, ncol=2)
 ```
+
+Next we will create interactive choropleth maps for both functional and non-functional water points which would allow us to zoom in with a closer look.
+
+```{r}
+tmap_mode("view")
+
+func <- tm_shape(nga_wp)+ 
+  tm_polygons("wpt functional", 
+              style = "equal", 
+              palette = "Greens")
+
+nonfunc <- tm_shape(nga_wp)+ 
+  tm_polygons("wpt non-functional", 
+              style = "equal", 
+              palette = "Reds")
+
+tmap_arrange(func, nonfunc, asp=1, ncol=1)
+
+tmap_mode("plot")
+```
+
+We can see that XXX
