@@ -30,7 +30,7 @@ pacman::p_load(sf, tidyverse, tmap, spdep, funModeling)
 
 ## Importing Geospatial Data
 
-In this in-class exercise, two geospatial data sets will be used, they:
+In this in-class exercise, two geospatial data sets will be used:
 
 -   `geo_export`
 

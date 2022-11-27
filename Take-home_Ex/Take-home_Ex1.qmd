@@ -62,7 +62,7 @@ Nigeria Level-2 Administrative Boundary (also known as Local Government Area) po
 
 ## Importing Geospatial Data
 
-In this in-class exercise, two geospatial data sets will be used, they:
+Two geospatial data sets used are:
 
 -   `geo_export`
 
