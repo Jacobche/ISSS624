@@ -75,7 +75,7 @@ First, we are going to import the water point geospatial data (i.e. `geo_export
 (Since we have previously used this data set in the in-class exercise, we will use the data directly from there.)
 
 ```{r}
-# eval: false
+#| eval: false
 wp <- st_read(dsn = "C:/Jacobche/ISSS624/In-class_Ex/rawdata",
               layer = "geo_export",
               crs = 4326) %>%
@@ -93,7 +93,7 @@ Note: Avoid performing transformation if you plan to use *st_intersects()* of **
 Next, *write_rds()* of **readr** package is used to save the extracted sf data table (i.e. `wp`) into an output file in rds data format. The output file is called `wp_nga.rds` and it is saved in rawdata sub-folder, which will not be uploaded to Git.
 
 ```{r}
-# eval: false
+#| eval: false
 wp_nga <- write_rds(wp,
                     "C:/Jacobche/ISSS624/In-class_Ex/rawdata/wp_nga.rds")
 ```
@@ -246,17 +246,19 @@ unknown <- qtm(nga_wp, "wpt unknown")+
 tmap_arrange(total, wp_functional, wp_nonfunctional, unknown, nrow=2, ncol=2)
 ```
 
-Next we will create interactive choropleth maps for non-functional water points which would allow us to zoom in with a closer look.
+Next we will create an interactive choropleth map for non-functional water points which would allow us to zoom in for a closer look.
 
 ```{r}
 tmap_mode("view")
 
 tm_shape(nga_wp) + 
   tm_polygons("wpt non-functional", 
-              style = "equal", 
-              palette = "Reds")
+              breaks = c(0, 71, 141, 211, 280),
+              palette = "Reds") +
+  tm_layout(title= "Spatial Distribution of Non-functional Water Points") +
+  tm_scale_bar()
 
 tmap_mode("plot")
 ```
 
-We can see that XXX
+From the map, we can see that the distribution of non-functional water points is not even with LGAs like Ifelodun and Igabi having a higher concentration than others. Nevertheless, there seem to be areas where they are clustered - i.e. around the Central and Western region of Nigeria.
