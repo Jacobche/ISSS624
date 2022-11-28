@@ -262,3 +262,94 @@ tmap_mode("plot")
 ```
 
 From the map, we can see that the distribution of non-functional water points is not even with LGAs like Ifelodun and Igabi having a higher concentration than others. Nevertheless, there seem to be areas where they are clustered - i.e. around the Central and Western region of Nigeria.
+
+## Global Spatial Autocorrelation
+
+In order to confirm our observation of signs of spatial clustering, we will make use of global autocorrection technique. We will compute the global spatial autocorrelation statistics and perform spatial complete randomness test for global spatial autocorrelation.
+
+### Computing Contiguity Spatial Weights
+
+Before we can compute the global spatial autocorrelation statistics, we need to construct a spatial weights of the study area. The spatial weights is used to define the neighbourhood relationships between the geographical units (i.e. LGA) in the study area.
+
+The code chunk below uses [*poly2nb()*](https://r-spatial.github.io/spdep/reference/poly2nb.html) of **spdep** package to compute the Queen contiguity weight matrix for Nigeria.
+
+```{r}
+wm_q <- poly2nb(nga_wp, 
+                queen=TRUE)
+
+set.ZeroPolicyOption(TRUE)
+
+summary(wm_q)
+```
+
+The summary report above shows that there are 774 LGAs in Nigeria. The most connected LGA has 14 neighbours. There are two LGAs with only one neighbours.
+
+### Row-standardised weights matrix
+
+Next, we need to assign weights to each neighboring polygon. In our case, each neighboring polygon will be assigned equal weight (style="W").
+
+```{r}
+rswm_q <- nb2listw(wm_q, 
+                   style="W", 
+                   zero.policy = TRUE)
+rswm_q
+```
+
+### Global Spatial Autocorrelation: Moran's I
+
+#### Maron's I test
+
+The code chunk below performs Moran's I statistical testing using [*moran.test()*](https://r-spatial.github.io/spdep/reference/moran.test.html) of **spdep**.
+
+```{r}
+moran.test(nga_wp$`wpt non-functional`,
+           listw=rswm_q, 
+           zero.policy = TRUE, 
+           na.action=na.omit)
+```
+
+From the Moran's I test since the p-value \< 2.2e-16 which is approximately 0, we can reject the null hypothesis at 99% confidence interval and can conclude that the distribution of non-functional water points in the LGAs are not randomly distributed. As the Moran I statistic = 0.433932927 \> 0, we can infer that there is sign of "clustered" spatial pattern.
+
+#### Computing Monte Carlo Moran's I
+
+The code chunk below performs permutation test for Moran's I statistic by using [*moran.mc()*](https://r-spatial.github.io/spdep/reference/moran.mc.html) of **spdep**. A total of 1000 simulation will be performed.
+
+```{r}
+set.seed(1234)
+bperm= moran.mc(nga_wp$`wpt non-functional`,
+                listw=rswm_q, 
+                nsim=999, 
+                zero.policy = TRUE, 
+                na.action=na.omit)
+bperm
+```
+
+From the Monte Carlo simulation since the p-value = 0.001, we can reject the null hypothesis at 99% confidence interval and can conclude that the distribution of non-functional water points in the LGAs are not randomly distributed. As the Moran I statistic = 0.43393 \> 0, we can infer that there is sign of "clustered" spatial pattern.
+
+### Global Spatial Autocorrelation: Geary's
+
+#### Geary's C test
+
+The code chunk below performs Geary's C test for spatial autocorrelation by using [*geary.test()*](https://r-spatial.github.io/spdep/reference/geary.test.html) of **spdep**.
+
+```{r}
+geary.test(nga_wp$`wpt non-functional`, listw=rswm_q)
+```
+
+From the Geary's C test since the p-value \< 2.2e-16 which is approximately 0, we can reject the null hypothesis at 99% confidence interval and can conclude that the distribution of non-functional water points in the LGAs are not randomly distributed. As the Geary C statistic = 0.6170907765 \< 1, we can again infer that there is sign of "clustered" spatial pattern.
+
+#### Computing Monte Carlo Geary's C
+
+The code chunk below performs permutation test for Geary's C statistic by using [*geary.mc()*](https://r-spatial.github.io/spdep/reference/geary.mc.html) of **spdep**.
+
+```{r}
+set.seed(1234)
+bperm=geary.mc(nga_wp$`wpt non-functional`, 
+               listw=rswm_q, 
+               nsim=999)
+bperm
+```
+
+From the Monte Carlo simulation since the p-value = 0.001, we can reject the null hypothesis at 99% confidence interval and can conclude that the distribution of non-functional water points in the LGAs are not randomly distributed. As the Geary C statistic = 0.61709 \< 1, we can again infer that there is sign of "clustered" spatial pattern.
+
+## Cluster and Outlier Analysis
