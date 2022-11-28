@@ -353,3 +353,182 @@ bperm
 From the Monte Carlo simulation since the p-value = 0.001, we can reject the null hypothesis at 99% confidence interval and can conclude that the distribution of non-functional water points in the LGAs are not randomly distributed. As the Geary C statistic = 0.61709 \< 1, we can again infer that there is sign of "clustered" spatial pattern.
 
 ## Cluster and Outlier Analysis
+
+Local Indicators of Spatial Association (LISA) are statistics that evaluate the existence of clusters in the spatial arrangement of a given variable. We will apply appropriate LISA, especially the local Moran's I to detect cluster and/or outlier from non-functional water points of Nigeria.
+
+### Computing local Moran's I
+
+To compute local Moran's I, the [*localmoran()*](https://r-spatial.github.io/spdep/reference/localmoran.html) function of **spdep** will be used. It computes *Ii* values, given a set of *zi* values and a listw object providing neighbour weighting information for the polygon associated with the zi values. The code chunks below are used to compute local Moran's I of non-functional water points at the LGA level.
+
+```{r}
+fips <- order(nga_wp$ADM2_EN)
+localMI <- localmoran(nga_wp$`wpt non-functional`, rswm_q)
+head(localMI)
+```
+
+The code chunk below lists the content of the local Moran matrix derived by using [*printCoefmat()*](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/printCoefmat). Additionally, [*paste()*](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/paste) of base R is used since `ADM2_EN` contains duplicated name but from different `ADM2_PCODE`.
+
+```{r}
+printCoefmat(data.frame(localMI[fips,], 
+                        row.names= paste(nga_wp$ADM2_PCODE,nga_wp$ADM2_EN)[fips]), 
+             check.names=FALSE)
+```
+
+#### Mapping the local Moran's I
+
+Before mapping the local Moran's I map, it is wise to append the local Moran's I dataframe (i.e. `localMI`) onto `nga_wp` SpatialPolygonDataFrame. The code chunks below can be used to perform the task. The out SpatialPolygonDataFrame is called `nga_wp.localMI`.
+
+```{r}
+nga_wp.localMI <- cbind(nga_wp,localMI) %>%
+  rename(Pr.Ii = Pr.z....E.Ii..)
+```
+
+#### Mapping local Moran's I values
+
+Using choropleth mapping functions of **tmap** package, we can plot the local Moran's I values by using the code chinks below.
+
+```{r}
+tm_shape(nga_wp.localMI) +
+  tm_fill(col = "Ii", 
+          style = "pretty",
+          palette = "RdBu",
+          title = "Local Moran's Statistics") +
+  tm_borders(alpha = 0.5)
+```
+
+#### Mapping local Moran's I p-values
+
+The choropleth shows there is evidence for both positive and negative Ii values. However, it is useful to consider the p-values for each of these values, as considered above. The code chunks below produce a choropleth map of Moran's I p-values by using functions of **tmap** package.
+
+```{r}
+tm_shape(nga_wp.localMI) +
+  tm_fill(col = "Pr.Ii", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "Local Moran's I p-values") +
+  tm_borders(alpha = 0.5)
+```
+
+#### Mapping both local Moran's I values and p-values
+
+For effective interpretation, it is better to plot both the local Moran's I values map and its corresponding p-values map next to each other.
+
+```{r}
+localMI.map <- tm_shape(nga_wp.localMI) +
+  tm_fill(col = "Ii", 
+          style = "pretty", 
+          title = "Local Moran's Statistics") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(scale = 0.7)
+
+pvalue.map <- tm_shape(nga_wp.localMI) +
+  tm_fill(col = "Pr.Ii", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "Local Moran's I p-values") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(scale = 0.7)
+
+tmap_arrange(localMI.map, pvalue.map, asp=1, ncol=2)
+```
+
+## Creating a LISA Cluster Map
+
+The LISA Cluster Map shows the significant locations color coded by type of spatial autocorrelation. The first step before we can generate the LISA cluster map is to plot the Moran scatterplot.
+
+### Plotting Moran scatterplot
+
+The Moran scatterplot is an illustration of the relationship between the values of the chosen attribute at each location and the average value of the same attribute at neighboring locations. The code chunk below plots the Moran scatterplot of non-functional water points by using [*moran.plot()*](https://r-spatial.github.io/spdep/reference/moran.plot.html) of **spdep**.
+
+```{r}
+nci <- moran.plot(nga_wp$`wpt non-functional`, rswm_q,
+                  labels=as.character(nga_wp$ADM2_EN), 
+                  xlab="Non-functional Water Points", 
+                  ylab="Spatially Lag Non-functional Water Points")
+```
+
+Notice that the plot is split into 4 quadrants. The top right corner belongs to areas that have high numbers of non-functional water points and are surrounded by other areas that have the average numbers of non-functional water points. These are the high-high locations.
+
+### Plotting Moran scatterplot with standardised variable
+
+The code below is used to plot the Moran scatterplot after applying [*scale()*](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/scale) to centers and scales the variable `wpt non-functional`.
+
+```{r}
+nga_wp$Z.NFWP <- scale(nga_wp$`wpt non-functional`) %>% as.vector
+
+nci2 <- moran.plot(nga_wp$Z.NFWP, rswm_q,
+                   labels=as.character(nga_wp$ADM2_EN),
+                   xlab="z-Non-functional Water Points", 
+                   ylab="Spatially Lag z-Non-functional Water Points")
+```
+
+### Preparing LISA map classes
+
+The code chunks below shows the steps to prepare a LISA cluster map which involves the following:
+
+-   To derive the spatially lagged variable of interest (i.e. `wpt non-functional`) and center the spatially lagged variable around its mean
+
+-   To center the local Moran\'s around the mean
+
+-   To set a statistical significance level for the local Moran
+
+-   To define the high-high, low-low, low-high and high-low categories
+
+-   To places non-significant Moran in the category 0
+
+```{r}
+quadrant <- vector(mode="numeric",length=nrow(localMI))
+nga_wp$lag_NFWP <- lag.listw(rswm_q, nga_wp$`wpt non-functional`)
+DV <- nga_wp$lag_NFWP - mean(nga_wp$lag_NFWP)     
+LM_I <- localMI[,1]   
+signif <- 0.05       
+quadrant[DV <0 & LM_I>0] <- 1
+quadrant[DV >0 & LM_I<0] <- 2
+quadrant[DV <0 & LM_I<0] <- 3  
+quadrant[DV >0 & LM_I>0] <- 4    
+quadrant[localMI[,5]>signif] <- 0
+```
+
+### Plotting LISA map
+
+The code chunk below is used to build the LISA map.
+
+```{r}
+nga_wp.localMI$quadrant <- quadrant
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+tm_shape(nga_wp.localMI) +
+  tm_fill(col = "quadrant", 
+          style = "cat", 
+          palette = colors[c(sort(unique(quadrant)))+1], 
+          labels = clusters[c(sort(unique(quadrant)))+1],
+          popup.vars = c("")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+```
+
+For effective interpretation, it is better to plot the choropleth map showing the non-functional water points distribution and the LISA map next to each other.
+
+```{r}
+nfwpc <- qtm(nga_wp, "wpt non-functional") +
+  tm_layout(scale = 0.7)
+
+nga_wp.localMI$quadrant <- quadrant
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISAmap <- tm_shape(nga_wp.localMI) +
+  tm_fill(col = "quadrant", 
+          style = "cat", 
+          palette = colors[c(sort(unique(quadrant)))+1], 
+          labels = clusters[c(sort(unique(quadrant)))+1],
+          popup.vars = c("")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5) +
+  tm_layout(scale = 0.7)
+
+tmap_arrange(nfwpc, LISAmap, asp=1, ncol=2)
+```
+
+We can see from the LISA map that there's a high-high cluster indicating positive autocorrelation for the LGAs having adjacent high numbers of non-functional water points. There is also a low-high cluster indicating negative autocorrelation/outliers whereby those LGAs with low numbers of non-functional water points are surrounded by those with high numbers of non-functional water points
