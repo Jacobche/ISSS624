@@ -584,7 +584,7 @@ The analysis consists of three steps:
 
 ### Deriving distance-based weight matrix
 
-Firstly, we need to define a new set of neighbours. Whist the spatial autocorrelation considered units which shared borders, for Getis-Ord we are defining neighbours based on distance.
+Firstly, we need to define a new set of neighbours. While the spatial autocorrelation considered units which shared borders, for Getis-Ord we are defining neighbours based on distance.
 
 There are two type of distance-based proximity matrix:
 
@@ -717,7 +717,7 @@ There is a clear sign of East-West divide in the GDP per capita by county of Hun
 
 ### Gi statistics using adaptive distance
 
-The code chunk below is used to compute the Gi values for `GDPPC2012` by using an adaptive distance weight matrix (i.e `knb_lw`).
+The code chunk below is used to compute the Gi values for `GDPPC2012` by using an adaptive distance weight matrix (i.e `knn_lw`).
 
 ```{r}
 fips <- order(hunan$County)

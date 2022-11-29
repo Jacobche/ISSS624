@@ -47,7 +47,7 @@ In the code chunk below, *p_load()* of **pacman** package is used to install and
 -   **funModeling**, to be used for rapid Exploratory Data Analysis
 
 ```{r}
-pacman::p_load(sf, tidyverse, tmap, spdep, funModeling)
+pacman::p_load(sf, tidyverse, tmap, spdep, funModeling, DT)
 ```
 
 ## The Data
@@ -369,9 +369,12 @@ head(localMI)
 The code chunk below lists the content of the local Moran matrix derived by using [*printCoefmat()*](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/printCoefmat). Additionally, [*paste()*](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/paste) of base R is used since `ADM2_EN` contains duplicated name but from different `ADM2_PCODE`.
 
 ```{r}
-printCoefmat(data.frame(localMI[fips,], 
-                        row.names= paste(nga_wp$ADM2_PCODE,nga_wp$ADM2_EN)[fips]), 
-             check.names=FALSE)
+temp <- data.frame(localMI[fips,],
+                   row.names = paste(nga_wp$ADM2_PCODE,nga_wp$ADM2_EN)[fips]) %>%
+  rename(Pr.Ii = Pr.z....E.Ii..)
+
+printCoefmat(temp, digits = 4,
+             check.names=FALSE) 
 ```
 
 #### Mapping the local Moran's I
@@ -468,7 +471,7 @@ The code chunks below shows the steps to prepare a LISA cluster map which involv
 
 -   To derive the spatially lagged variable of interest (i.e. `wpt non-functional`) and center the spatially lagged variable around its mean
 
--   To center the local Moran\'s around the mean
+-   To center the local Moran's around the mean
 
 -   To set a statistical significance level for the local Moran
 
@@ -531,4 +534,153 @@ LISAmap <- tm_shape(nga_wp.localMI) +
 tmap_arrange(nfwpc, LISAmap, asp=1, ncol=2)
 ```
 
-We can see from the LISA map that there's a high-high cluster indicating positive autocorrelation for the LGAs having adjacent high numbers of non-functional water points. There is also a low-high cluster indicating negative autocorrelation/outliers whereby those LGAs with low numbers of non-functional water points are surrounded by those with high numbers of non-functional water points
+We can see from the LISA map that there's a high-high cluster indicating positive autocorrelation for the LGAs having adjacent high numbers of non-functional water points. There is also a low-high cluster indicating negative autocorrelation/outliers whereby those LGAs with low numbers of non-functional water points are surrounded by those with high numbers of non-functional water points. And clearly the eastern region is very much a low-low cluster having adjacent low numbers of non-functional water points.
+
+## Hot Spot and Cold Spot Area Analysis
+
+Beside detecting cluster and outliers, localised spatial statistics can also be used to detect hot spot and/or cold spot areas. The term 'hot spot' has been used generically across disciplines to describe a region or value that is higher relative to its surroundings.
+
+### Getis and Ord's G-Statistics
+
+An alternative spatial statistics to detect spatial anomalies is the Getis and Ord's G-statistics. It looks at neighbours within a defined proximity to identify where either high or low values clutser spatially. Here, statistically significant hot-spots are recognised as areas of high values where other areas within a neighbourhood range also share high values too.
+
+The analysis consists of three steps:
+
+-   Deriving spatial weight matrix
+
+-   Computing Gi statistics
+
+-   Mapping Gi statistics
+
+### Deriving distance-based weight matrix
+
+Firstly, we need to define a new set of neighbours. While the spatial autocorrelation considered units which shared borders, for Getis-Ord we are defining neighbours based on adaptive distance weight matrix here for the case of LGAs in NIgeria.
+
+#### Deriving the centroid
+
+The code chunk below uses *cbind()* to put longitude and latitude into the same object for the centroid.
+
+```{r}
+longitude <- map_dbl(nga_wp$geometry, ~st_centroid(.x)[[1]])
+latitude <- map_dbl(nga_wp$geometry, ~st_centroid(.x)[[2]])
+coords <- cbind(longitude, latitude)
+```
+
+### Computing adaptive distance weight matrix
+
+We can control the numbers of neighbours directly using k-nearest neighbours, either accepting asymmetric neighbours or imposing symmetry as shown in the code chunk below.
+
+```{r}
+knn <- knn2nb(knearneigh(coords, k=8))
+knn
+```
+
+Next, *nb2listw()* is used to convert the nb object into spatial weights object.
+
+```{r}
+knn_lw <- nb2listw(knn, style = 'B')
+summary(knn_lw)
+```
+
+### Gi statistics using adaptive distance
+
+The code chunk below is used to compute the Gi values for `wpt non-functional` by using an adaptive distance weight matrix (i.e `knn_lw`).
+
+```{r}
+fips <- order(nga_wp$ADM2_EN)
+gi.adaptive <- localG(nga_wp$`wpt non-functional`, knn_lw)
+nga_wp.gi <- cbind(nga_wp, as.matrix(gi.adaptive)) %>%
+  rename(gstat_adaptive = as.matrix.gi.adaptive.)
+```
+
+### Mapping Gi values with adaptive distance weights
+
+It is time for us to visualise the locations of hot spot and cold spot areas. The choropleth mapping functions of **tmap** package will be used to map the Gi values.
+
+The code chunk below shows the functions used to map the Gi values derived using adaptive distance weight matrix.
+
+```{r}
+nfwpc <- qtm(nga_wp, "wpt non-functional") +
+  tm_layout(scale = 0.7)
+
+Gimap <- tm_shape(nga_wp.gi) + 
+  tm_fill(col = "gstat_adaptive", 
+          style = "pretty", 
+          palette="-RdBu", 
+          title = "Local Gi") + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(scale = 0.7)
+
+tmap_arrange(nfwpc, Gimap, asp=1, ncol=2)
+```
+
+In the Gi map above, LGAs shaded in red are the hot spot areas and LGAs shaded in blue are the cold spot areas. The darkness of the colours representing the intensity of the Gi values.
+
+The code below creates an interactive Gi map which would then tell us exactly which are the hot spot and cold spot areas.
+
+```{r}
+tmap_mode("view")
+
+tm_shape(nga_wp.gi) + 
+  tm_fill(col = "gstat_adaptive", 
+          style = "pretty", 
+          palette="-RdBu", 
+          title = "Local Gi") + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(title= "Gi Map of Non-functional Water Points") +
+  tm_scale_bar()
+
+tmap_mode("plot")
+```
+
+After zooming in, some of the hot spot LGAs are `Ilorin South`, `Kaduna North` and `Kaduna South` while some of the cold spot LGAs are `Kala/Balge`, `Kukawa` and `Marte`.
+
+[**List of hot spot LGAs by rank**]{.underline}
+
+```{r}
+hotspot_rank <- nga_wp.gi %>%
+  select(ADM2_EN, gstat_adaptive) %>%
+  filter(gstat_adaptive > 4) %>%
+  arrange(desc(gstat_adaptive))
+
+hotspot_rank <- hotspot_rank %>%
+  mutate(rank = 1:nrow(hotspot_rank)) %>%
+  select(rank, ADM2_EN, gstat_adaptive)
+```
+
+```{r}
+DT::datatable(hotspot_rank,
+              rownames = FALSE,
+              colnames = c('Rank' = 'rank',
+                           'LGAs' = 'ADM2_EN',
+                           'Local Gi' = 'gstat_adaptive'), 
+              filter = 'top',
+              class = 'display')
+```
+
+As seen above, there are 15 hot spot LGAs with `Ilorin South` being the highest ranked LGA in Nigeria.
+
+[**List of cold spot LGAs by rank**]{.underline}
+
+```{r}
+coldspot_rank <- nga_wp.gi %>%
+  select(ADM2_EN, gstat_adaptive) %>%
+  filter(gstat_adaptive < -2) %>%
+  arrange(gstat_adaptive)
+
+coldspot_rank <- coldspot_rank %>%
+  mutate(rank = 1:nrow(coldspot_rank)) %>%
+  select(rank, ADM2_EN, gstat_adaptive)
+```
+
+```{r}
+DT::datatable(coldspot_rank,
+              rownames = FALSE,
+              colnames = c('Rank' = 'rank',
+                           'LGAs' = 'ADM2_EN',
+                           'Local Gi' = 'gstat_adaptive'), 
+              filter = 'top',
+              class = 'display')
+```
+
+As seen above, there are 136 cold spot LGAs with `Kala/Balge` being the highest ranked LGA in Nigeria.
