@@ -1060,7 +1060,7 @@ Zixing        -7.6849e-01 -8.8210e-02  9.4057e-01 -7.0144e-01         0.4830</co
 </section>
 <section id="deriving-distance-based-weight-matrix" class="level3">
 <h3 class="anchored" data-anchor-id="deriving-distance-based-weight-matrix">Deriving distance-based weight matrix</h3>
-<p>Firstly, we need to define a new set of neighbours. Whist the spatial autocorrelation considered units which shared borders, for Getis-Ord we are defining neighbours based on distance.</p>
+<p>Firstly, we need to define a new set of neighbours. While the spatial autocorrelation considered units which shared borders, for Getis-Ord we are defining neighbours based on distance.</p>
 <p>There are two type of distance-based proximity matrix:</p>
 <ul>
 <li><p>fixed distance weight matrix</p></li>
@@ -1269,7 +1269,7 @@ attr(,"class")
 </section>
 <section id="gi-statistics-using-adaptive-distance" class="level3">
 <h3 class="anchored" data-anchor-id="gi-statistics-using-adaptive-distance">Gi statistics using adaptive distance</h3>
-<p>The code chunk below is used to compute the Gi values for <code>GDPPC2012</code> by using an adaptive distance weight matrix (i.e <code>knb_lw</code>).</p>
+<p>The code chunk below is used to compute the Gi values for <code>GDPPC2012</code> by using an adaptive distance weight matrix (i.e <code>knn_lw</code>).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>fips <span class="ot">&lt;-</span> <span class="fu">order</span>(hunan<span class="sc">$</span>County)</span>
 <span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>gi.adaptive <span class="ot">&lt;-</span> <span class="fu">localG</span>(hunan<span class="sc">$</span>GDPPC, knn_lw)</span>

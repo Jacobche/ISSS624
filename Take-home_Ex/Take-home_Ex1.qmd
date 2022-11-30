@@ -255,7 +255,6 @@ tm_shape(nga_wp) +
   tm_polygons("wpt non-functional", 
               breaks = c(0, 71, 141, 211, 280),
               palette = "Reds") +
-  tm_layout(title= "Spatial Distribution of Non-functional Water Points") +
   tm_scale_bar()
 
 tmap_mode("plot")
@@ -627,7 +626,6 @@ tm_shape(nga_wp.gi) +
           palette="-RdBu", 
           title = "Local Gi") + 
   tm_borders(alpha = 0.5) +
-  tm_layout(title= "Gi Map of Non-functional Water Points") +
   tm_scale_bar()
 
 tmap_mode("plot")
@@ -658,7 +656,7 @@ DT::datatable(hotspot_rank,
               class = 'display')
 ```
 
-As seen above, there are 15 hot spot LGAs with `Ilorin South` being the highest ranked LGA in Nigeria.
+As seen above, there are 15 hot spot LGAs with `Ilorin South` being the highest ranked LGA in Nigeria. It is no wonder residents in [Ilorin groaned over lack of water](https://dailytrust.com/ilorin-residents-groan-over-lack-of-water/).
 
 [**List of cold spot LGAs by rank**]{.underline}
 
