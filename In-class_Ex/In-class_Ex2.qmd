@@ -41,7 +41,7 @@ In this in-class exercise, two geospatial data sets will be used:
 First, we are going to import the water point geospatial data (i.e. `geo_export`) by using the code chunk below.
 
 ```{r}
-# eval: false
+#| eval: false
 wp <- st_read(dsn = "rawdata",
               layer = "geo_export",
               crs = 4326) %>%
@@ -59,7 +59,7 @@ Note: Avoid performing transformation if you plan to use *st_intersects()* of **
 Next, *write_rds()* of **readr** package is used to save the extracted sf data table (i.e. `wp`) into an output file in rds data format. The output file is called `wp_nga.rds` and it is saved in rawdata sub-folder, which will not be uploaded to Git.
 
 ```{r}
-# eval: false
+#| eval: false
 wp_nga <- write_rds(wp,
                     "rawdata/wp_nga.rds")
 ```
