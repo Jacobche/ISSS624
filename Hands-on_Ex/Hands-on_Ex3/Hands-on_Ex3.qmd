@@ -70,10 +70,10 @@ The R packages needed for this exercise are as follows:
 
     -   **ClustGeo**
 
-The code chunks below installs and launches these R packages into R environment.
+The code chunk below installs and launches these R packages into R environment.
 
 ```{r}
-pacman::p_load(rgdal, spdep, tmap, sf, 
+pacman::p_load(rgdal, spdep, tmap, sf, ClustGeo, 
                ggpubr, cluster, factoextra, NbClust,
                heatmaply, corrplot, psych, tidyverse)
 ```
@@ -128,7 +128,7 @@ There are a total of eleven fields and 55 observation in the tibble data.frame.
 
 The unit of measurement of the values is number of households. Using these values directly will be biased by the underlying total numbers of households. In general, the townships with relatively higher number of households will also have higher number of households owning radio, TV, etc.
 
-In order to overcome this problem, we will derive the penetration rate of each ICT variable by using the code chunk below.
+In order to overcome this problem, we will derive the penetration rate of each ICT variable (per 1000 household) by using the code chunk below.
 
 ```{r}
 ict_derived <- ict %>%
@@ -780,4 +780,71 @@ shclust.map <- qtm(shan_sf_spatialcluster,
 
 tmap_arrange(hclust.map, shclust.map,
              asp=NA, ncol=2)
+```
+
+```{r}
+#| echo: false
+#| eval: false
+nongeo_cluster <- hclustgeo(proxmat)
+plot(nongeo_cluster, cex = 0.5)
+rect.hclust(nongeo_cluster, 
+            k = 6, 
+            border = 2:5)
+```
+
+```{r}
+#| echo: false
+#| eval: false
+groups <- as.factor(cutree(nongeo_cluster, k=6))
+```
+
+```{r}
+#| echo: false
+#| eval: false
+shan_sf_ngeo_cluster <- cbind(shan_sf, as.matrix(groups)) %>%
+  rename(`CLUSTER` = `as.matrix.groups.`)
+```
+
+```{r}
+#| echo: false
+#| eval: false
+qtm(shan_sf_ngeo_cluster, "CLUSTER")
+```
+
+```{r}
+#| echo: false
+#| eval: false
+dist <- st_distance(shan_sf, shan_sf)
+distmat <- as.dist(dist)
+```
+
+```{r}
+#| echo: false
+#| eval: false
+cr <- choicealpha(proxmat, distmat, range.alpha = seq(0, 1, 0.1), K=6, graph = TRUE)
+```
+
+```{r}
+#| echo: false
+#| eval: false
+clustG <- hclustgeo(proxmat, distmat, alpha = 0.3)
+```
+
+```{r}
+#| echo: false
+#| eval: false
+groups <- as.factor(cutree(clustG, k=6))
+```
+
+```{r}
+#| echo: false
+#| eval: false
+shan_sf_Gcluster <- cbind(shan_sf, as.matrix(groups)) %>%
+  rename(`CLUSTER` = `as.matrix.groups.`)
+```
+
+```{r}
+#| echo: false
+#| eval: false
+qtm(shan_sf_Gcluster, "CLUSTER")
 ```

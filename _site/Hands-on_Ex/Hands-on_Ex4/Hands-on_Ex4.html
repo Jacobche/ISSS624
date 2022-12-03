@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.1.189">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>ISSS624 - Hands-on Exercise 4: Calibrating Hedonic Pricing Model for Private Highrise Property with GWR Method</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">ISSS624</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">Hands-on Exercise</a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex1/Hands-on_Ex1.html">
+ <span class="dropdown-text">Hands-on Exercise 1.1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex1/Hands-on_Ex1_2.html">
+ <span class="dropdown-text">Hands-on Exercise 1.2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex2/Hands-on_Ex2.html">
+ <span class="dropdown-text">Hands-on Exercise 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex3/Hands-on_Ex3.html">
+ <span class="dropdown-text">Hands-on Exercise 3</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex4/Hands-on_Ex4.html">
+ <span class="dropdown-text">Hands-on Exercise 4</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">In-class Exercise</a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex1/In-class_Ex1.html">
+ <span class="dropdown-text">In-class Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex2.html">
+ <span class="dropdown-text">In-class Exercise 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex3.html">
+ <span class="dropdown-text">In-class Exercise 3</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">Take-home Exercise</a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../Take-home_Ex/Take-home_Ex1.html">
+ <span class="dropdown-text">Take-home Exercise 1</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html">Home</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">About</a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data">The Data</a></li>
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting Started</a></li>
+  <li><a href="#a-shirt-note-about-gwmodel" id="toc-a-shirt-note-about-gwmodel" class="nav-link" data-scroll-target="#a-shirt-note-about-gwmodel">A shirt note about GWmodel</a></li>
+  <li><a href="#geospatial-data-wrangling" id="toc-geospatial-data-wrangling" class="nav-link" data-scroll-target="#geospatial-data-wrangling">Geospatial Data Wrangling</a>
+  <ul class="collapse">
+  <li><a href="#importing-geospatial-data" id="toc-importing-geospatial-data" class="nav-link" data-scroll-target="#importing-geospatial-data">Importing geospatial data</a></li>
+  <li><a href="#updating-crs-information" id="toc-updating-crs-information" class="nav-link" data-scroll-target="#updating-crs-information">Updating CRS information</a></li>
+  </ul></li>
+  <li><a href="#aspatial-data-wrangling" id="toc-aspatial-data-wrangling" class="nav-link" data-scroll-target="#aspatial-data-wrangling">Aspatial Data Wrangling</a>
+  <ul class="collapse">
+  <li><a href="#importing-the-aspatial-data" id="toc-importing-the-aspatial-data" class="nav-link" data-scroll-target="#importing-the-aspatial-data">Importing the aspatial data</a></li>
+  <li><a href="#converting-aspatial-data-frame-into-a-sf-object" id="toc-converting-aspatial-data-frame-into-a-sf-object" class="nav-link" data-scroll-target="#converting-aspatial-data-frame-into-a-sf-object">Converting aspatial data frame into a sf object</a></li>
+  </ul></li>
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link" data-scroll-target="#exploratory-data-analysis">Exploratory Data Analysis</a>
+  <ul class="collapse">
+  <li><a href="#eda-using-statistical-graphics" id="toc-eda-using-statistical-graphics" class="nav-link" data-scroll-target="#eda-using-statistical-graphics">EDA using statistical graphics</a></li>
+  <li><a href="#multiple-histogram-plots-distribution-of-variables" id="toc-multiple-histogram-plots-distribution-of-variables" class="nav-link" data-scroll-target="#multiple-histogram-plots-distribution-of-variables">Multiple Histogram Plots distribution of variables</a></li>
+  <li><a href="#drawing-statistical-point-map" id="toc-drawing-statistical-point-map" class="nav-link" data-scroll-target="#drawing-statistical-point-map">Drawing Statistical Point Map</a></li>
+  </ul></li>
+  <li><a href="#hedonic-pricing-modelling-in-r" id="toc-hedonic-pricing-modelling-in-r" class="nav-link" data-scroll-target="#hedonic-pricing-modelling-in-r">Hedonic Pricing Modelling in R</a>
+  <ul class="collapse">
+  <li><a href="#simple-linear-regression-method" id="toc-simple-linear-regression-method" class="nav-link" data-scroll-target="#simple-linear-regression-method">Simple Linear Regression Method</a></li>
+  <li><a href="#multiple-linear-regression-method" id="toc-multiple-linear-regression-method" class="nav-link" data-scroll-target="#multiple-linear-regression-method">Multiple Linear Regression Method</a></li>
+  <li><a href="#building-a-hedonic-pricing-model-using-multiple-linear-regression-method" id="toc-building-a-hedonic-pricing-model-using-multiple-linear-regression-method" class="nav-link" data-scroll-target="#building-a-hedonic-pricing-model-using-multiple-linear-regression-method">Building a hedonic pricing model using multiple linear regression method</a></li>
+  </ul></li>
+  <li><a href="#building-hedonic-pricing-models-using-gwmodel" id="toc-building-hedonic-pricing-models-using-gwmodel" class="nav-link" data-scroll-target="#building-hedonic-pricing-models-using-gwmodel">Building Hedonic Pricing Models using GWmodel</a>
+  <ul class="collapse">
+  <li><a href="#building-fixed-bandwidth-gwr-model" id="toc-building-fixed-bandwidth-gwr-model" class="nav-link" data-scroll-target="#building-fixed-bandwidth-gwr-model">Building Fixed Bandwidth GWR Model</a></li>
+  <li><a href="#building-adaptive-bandwidth-gwr-model" id="toc-building-adaptive-bandwidth-gwr-model" class="nav-link" data-scroll-target="#building-adaptive-bandwidth-gwr-model">Building Adaptive Bandwidth GWR Model</a></li>
+  <li><a href="#visualising-gwr-output" id="toc-visualising-gwr-output" class="nav-link" data-scroll-target="#visualising-gwr-output">Visualising GWR Output</a></li>
+  <li><a href="#converting-sdf-into-sf-data.frame" id="toc-converting-sdf-into-sf-data.frame" class="nav-link" data-scroll-target="#converting-sdf-into-sf-data.frame">Converting SDF into <strong>sf</strong> data.frame</a></li>
+  <li><a href="#visualising-local-r2" id="toc-visualising-local-r2" class="nav-link" data-scroll-target="#visualising-local-r2">Visualising local R2</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Hands-on Exercise 4: Calibrating Hedonic Pricing Model for Private Highrise Property with GWR Method</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>Geographically weighted regression (GWR) is a spatial statistical technique that takes non-stationary variables into consideration (e.g.&nbsp;climate; demographic factors; physical environment characteristics) and models the local relationships between these independent variables and an outcome of interest (also known as dependent variable). In this hands-on exercise, we will learn to build hedonic pricing models by using GWR methods. The dependent variable is the resale prices of condominium in 2015. The independent variables are divided into either structural and locational.</p>
+</section>
+<section id="the-data" class="level2">
+<h2 class="anchored" data-anchor-id="the-data">The Data</h2>
+<p>Two data sets will be used in this model building exercise:</p>
+<ul>
+<li><p>URA Master Plan subzone boundary in shapefile format (i.e.&nbsp;<code>MP14_SUBZONE_WEB_PL</code>)</p></li>
+<li><p>condo_resale_2015 in csv format (i.e.&nbsp;<code>condo_resale_2015.csv</code>)</p></li>
+</ul>
+</section>
+<section id="getting-started" class="level2">
+<h2 class="anchored" data-anchor-id="getting-started">Getting Started</h2>
+<p>Before we get started, it is important for us to install the necessary R packages into R and launch these R packages into R environment.</p>
+<p>The R packages needed for this exercise are as follows:</p>
+<ul>
+<li><p>R package for building OLS and performing diagnostics tests</p>
+<ul>
+<li><a href="https://olsrr.rsquaredacademy.com/"><strong>olsrr</strong></a></li>
+</ul></li>
+<li><p>R package for calibrating geographical weighted family of models</p>
+<ul>
+<li><a href="https://cran.r-project.org/web/packages/GWmodel/"><strong>GWmodel</strong></a></li>
+</ul></li>
+<li><p>R package for multivariate data visualisation and analysis</p>
+<ul>
+<li><a href="https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html"><strong>corrplot</strong></a></li>
+</ul></li>
+<li><p>Spatial data handling</p>
+<ul>
+<li><strong>sf</strong></li>
+</ul></li>
+<li><p>Attribute data handling</p>
+<ul>
+<li><strong>tidyverse</strong>, especially <strong>readr</strong>, <strong>ggplot2</strong> and <strong>dplyr</strong></li>
+</ul></li>
+<li><p>Choropleth mapping</p>
+<ul>
+<li><strong>tmap</strong></li>
+</ul></li>
+</ul>
+<p>The code chunks below installs and launches these R packages into R environment.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="a-shirt-note-about-gwmodel" class="level2">
+<h2 class="anchored" data-anchor-id="a-shirt-note-about-gwmodel">A shirt note about GWmodel</h2>
+<p><a href="https://www.jstatsoft.org/article/view/v063i17"><strong>GWmodel</strong></a> package provides a collection of localised spatial statistical methods, namely: GW summary statistics, GW principal components analysis, GW discriminant analysis and various forms of GW regression; some of which are provided in basic and robust (outlier resistant) forms. Commonly, outputs or parameters of the GWmodel are mapped to provide an useful exploratory tool, which can often precede (and direct) a more traditional or sophisticated statistical analysis.</p>
+</section>
+<section id="geospatial-data-wrangling" class="level2">
+<h2 class="anchored" data-anchor-id="geospatial-data-wrangling">Geospatial Data Wrangling</h2>
+<section id="importing-geospatial-data" class="level3">
+<h3 class="anchored" data-anchor-id="importing-geospatial-data">Importing geospatial data</h3>
+<p>The geospatial data used in this hands-on exercise is called <code>MP14_SUBZONE_WEB_PL</code>. It is in ESRI shapefile format. The shapefile consists of URA Master Plan 2014’s planning subzone boundaries. Polygon features are used to represent these geographic boundaries. The GIS data is in <strong>svy21</strong> projected coordinates systems.</p>
+<p>The code chunk below is used to import <code>MP_SUBZONE_WEB_PL</code> shapefile by using <em>st_read()</em> of <strong>sf</strong> packages.</p>
+<p>(Since we have previously used this data set in the hands-on exercise, we will use the data directly from there.)</p>
+<div class="cell">
+
+</div>
+<p>The report above shows that the R object used to contain the imported <code>MP14_SUBZONE_WEB_PL</code> shapefile is called <code>mpsz</code> and it is a simple feature object. The geometry type is multipolygon. It is also important to note that <code>mpsz</code> simple feature object does not have EPSG information.</p>
+</section>
+<section id="updating-crs-information" class="level3">
+<h3 class="anchored" data-anchor-id="updating-crs-information">Updating CRS information</h3>
+<p>The code chunk below updates the newly imported <code>mpsz</code> with the correct ESPG code (i.e.&nbsp;3414)</p>
+<div class="cell">
+
+</div>
+<p>After transforming the projection metadata, we can verify the projection of the newly transformed <code>mpsz_svy21</code> by using <em>st_crs()</em> of <strong>sf</strong> package.</p>
+<p>The code chunk below will be used to verify the newly transformed <code>mpsz_svy21</code>.</p>
+<div class="cell">
+
+</div>
+<p>Notice that the EPSG is indicated as 3414 now.</p>
+<p>Next, we will reveal the extent of <code>mpsz_svy21</code> by using <em>st_bbox()</em> of <strong>sf</strong> package.</p>
+<div class="cell">
+
+</div>
+</section>
+</section>
+<section id="aspatial-data-wrangling" class="level2">
+<h2 class="anchored" data-anchor-id="aspatial-data-wrangling">Aspatial Data Wrangling</h2>
+<section id="importing-the-aspatial-data" class="level3">
+<h3 class="anchored" data-anchor-id="importing-the-aspatial-data">Importing the aspatial data</h3>
+<p>The <code>condo_resale_2015</code> is in csv file format. The codes chunk below uses <em>read_csv()</em> function of <strong>readr</strong> package to import <code>condo_resale_2015</code> into R as a tibble data frame called <code>condo_resale</code>.</p>
+<div class="cell">
+
+</div>
+<p>After importing the data file into R, it is important for us to examine if the data file has been imported correctly.</p>
+<p>The code chunk below uses <em>glimpse()</em> to display the data structure.</p>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+</section>
+<section id="converting-aspatial-data-frame-into-a-sf-object" class="level3">
+<h3 class="anchored" data-anchor-id="converting-aspatial-data-frame-into-a-sf-object">Converting aspatial data frame into a sf object</h3>
+<p>Currently, the condo_resale data frame is aspatial. We will convert it to a <strong>sf</strong> object. The code chunk below converts <code>condo_resale</code> data frame into a simple feature data frame by using <em>st_as_sf()</em> of <strong>sf</strong> packages.</p>
+<p>Notice that <em>st_transform()</em> of <strong>sf</strong> package is used to convert the coordinates from <strong>wgs84</strong> (i.e.&nbsp;crs:4326) to <strong>svy21</strong> (i.e.&nbsp;crs=3414).</p>
+<div class="cell">
+
+</div>
+</section>
+</section>
+<section id="exploratory-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis">Exploratory Data Analysis</h2>
+<section id="eda-using-statistical-graphics" class="level3">
+<h3 class="anchored" data-anchor-id="eda-using-statistical-graphics">EDA using statistical graphics</h3>
+<p>We can plot the distribution of <code>SELLING_PRICE</code> by using appropriate Exploratory Data Analysis (EDA) as shown in the code chunk below.</p>
+<div class="cell">
+
+</div>
+<p>The figure above reveals a right skewed distribution. This means that more condominium units were transacted at relative lower prices.</p>
+<p>Statistically, the skewed dsitribution can be normalised by using log transformation. The code chunk below is used to derive a new variable called <code>LOG_SELLING_PRICE</code> by using a log transformation on the variable <code>SELLING_PRICE</code>. It is performed using <em>mutate()</em> of <strong>dplyr</strong> package.</p>
+<div class="cell">
+
+</div>
+<p>Now, we can plot the <code>LOG_SELLING_PRICE</code> using the code chunk below.</p>
+<div class="cell">
+
+</div>
+<p>Notice that the distribution is relatively less skewed after the transformation.</p>
+</section>
+<section id="multiple-histogram-plots-distribution-of-variables" class="level3">
+<h3 class="anchored" data-anchor-id="multiple-histogram-plots-distribution-of-variables">Multiple Histogram Plots distribution of variables</h3>
+<p>In this section, we will learn to draw a small multiple histograms (also known as trellis plot) by using <em>ggarrange()</em> of <a href="https://cran.r-project.org/web/packages/ggpubr/"><strong>ggpubr</strong></a> package.</p>
+<p>The code chunk below is used to create 12 histograms. Then, <em>ggarrange()</em> is used to organise these histograms into a 3 columns by 4 rows small multiple plot.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="drawing-statistical-point-map" class="level3">
+<h3 class="anchored" data-anchor-id="drawing-statistical-point-map">Drawing Statistical Point Map</h3>
+<p>Lastly, we want to reveal the geospatial distribution condominium resale prices in Singapore. The map will be prepared by using <strong>tmap</strong> package.</p>
+<p>First, we will turn on the interactive mode of <strong>tmap</strong> by using the code chunk below.</p>
+<div class="cell">
+
+</div>
+<p>Next, the code chunks below is used to create an interactive point symbol map.</p>
+<div class="cell">
+
+</div>
+<p>Notice that <a href="https://www.rdocumentation.org/packages/tmap/versions/2.2/topics/tm_symbols"><em>tm_dots()</em></a> is used instead of <em>tm_bubbles()</em>.</p>
+<p><em>set.zoom.limits</em> argument of <em>tm_view()</em> sets the minimum and maximum zoom level to 11 and 14 respectively.</p>
+<p>Before moving on to the next section, the code below will be used to turn R display into <strong>plot</strong> mode.</p>
+<div class="cell">
+
+</div>
+</section>
+</section>
+<section id="hedonic-pricing-modelling-in-r" class="level2">
+<h2 class="anchored" data-anchor-id="hedonic-pricing-modelling-in-r">Hedonic Pricing Modelling in R</h2>
+<p>In this section, we will learn to build hedonic pricing models for condominium resale units using <a href="https://www.rdocumentation.org/packages/stats/versions/3.5.2/topics/lm"><em>lm()</em></a> of R base.</p>
+<section id="simple-linear-regression-method" class="level3">
+<h3 class="anchored" data-anchor-id="simple-linear-regression-method">Simple Linear Regression Method</h3>
+<p>First, we will build a simple linear regression model by using <code>SELLING_PRICE</code> as the dependent variable and <code>AREA_SQM</code> as the independent variable.</p>
+<div class="cell">
+
+</div>
+<p><em>lm()</em> returns an object of class “lm” or for multiple responses of class c(“mlm”, “lm”).</p>
+<p>The functions <em>summary()</em> and <em>anova()</em> can be used to obtain and print a summary and analysis of variance table of the results. The generic accessor functions in coefficients, effects, fitted.values and residuals extract various useful features of the value returned by <strong>lm</strong>.</p>
+<div class="cell">
+
+</div>
+<p>The output report reveals that the <code>SELLING_PRICE</code> can be explained by using the formula:</p>
+<p><strong>y = -258121.1 + 14719x1</strong></p>
+<p>The R-squared of 0.4518 reveals that the simple regression model built is able to explain about 45% of the resale prices.</p>
+<p>Since p-value is much smaller than 0.0001, we will reject the null hypothesis that mean is a good estimator of <code>SELLING_PRICE</code>. This will allow us to infer that simple linear regression model above is a good estimator of <code>SELLING_PRICE</code>.</p>
+<p>The <strong>Coefficients:</strong> section of the report reveals that the p-values of both the estimates of the Intercept and <code>ARA_SQM</code> are smaller than 0.001. In view of this, the null hypothesis of the B0 and B1 are equal to 0 will be rejected. As a results, we will be able to infer that the B0 and B1 are good parameter estimates.</p>
+<p>To visualise the best fit curve on a scatterplot, we can incorporate <em>lm()</em> as a method function in <strong>ggplot</strong>’s geometry as shown in the code chunk below.</p>
+<div class="cell">
+
+</div>
+<p>Figure above reveals that there are a few statistical outliers with relatively high selling prices.</p>
+</section>
+<section id="multiple-linear-regression-method" class="level3">
+<h3 class="anchored" data-anchor-id="multiple-linear-regression-method">Multiple Linear Regression Method</h3>
+<section id="visualising-the-relationships-of-the-independent-variables" class="level4">
+<h4 class="anchored" data-anchor-id="visualising-the-relationships-of-the-independent-variables">Visualising the relationships of the independent variables</h4>
+<p>Before building a multiple regression model, it is important to ensure that the independent variables used are not highly correlated to each other. If these highly correlated independent variables are used in building a regression model by mistake, the quality of the model will be compromised. This phenomena is known as <strong>multicollinearity</strong> in statistics.</p>
+<p>Correlation matrix is commonly used to visualise the relationships between the independent variables. Beside the <em>pairs()</em> of R, there are many packages supporting the display of a correlation matrix. In this section, the <a href="https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html"><strong>corrplot</strong></a> package will be used.</p>
+<p>The code chunk below is used to plot a scatterplot matrix of the relationship between the independent variables in <code>condo_resale</code> data.frame.</p>
+<div class="cell">
+
+</div>
+<p>Matrix reorder is very important for mining the hidden structure and pattern in the matrix. There are four methods in <strong>corrplot</strong> (parameter order), named “AOE”, “FPC”, “hclust”, “alphabet”. In the code chunk above, AOE order is used. It orders the variables by using the <strong>angular order of the eigenvectors</strong> method suggested by <a href="https://www.datavis.ca/papers/corrgram.pdf">Michael Friendly</a>.</p>
+<p>From the scatterplot matrix, it is clear that <strong><em>Freehold</em></strong> is highly correlated to <strong><em>LEASE_99YEAR</em></strong>. In view of this, it is wiser to only include either one of them in the subsequent model building. As a result, <strong><em>LEASE_99YEAR</em></strong> is excluded in the subsequent model building.</p>
+</section>
+</section>
+<section id="building-a-hedonic-pricing-model-using-multiple-linear-regression-method" class="level3">
+<h3 class="anchored" data-anchor-id="building-a-hedonic-pricing-model-using-multiple-linear-regression-method">Building a hedonic pricing model using multiple linear regression method</h3>
+<p>The code chunk below using <em>lm()</em> to calibrate the multiple linear regression model.</p>
+<div class="cell">
+
+</div>
+<p>With reference to the report above, it is clear that not all the independent variables are statistically significant. We will revise the model by removing those variables which are not statistically significant.</p>
+<p>Now, we are ready to calibrate the revised model by using the code chunk below.</p>
+<div class="cell">
+
+</div>
+<section id="checking-for-multicolinearity" class="level4">
+<h4 class="anchored" data-anchor-id="checking-for-multicolinearity">Checking for multicolinearity</h4>
+<p>In this section, we would like to introduce a fantastic R package specially programmed for performing OLS regression. It is called <a href="https://olsrr.rsquaredacademy.com/"><strong>olsrr</strong></a>. It provides a collection of very useful methods for building better multiple linear regression models:</p>
+<ul>
+<li><p>comprehensive regression output</p></li>
+<li><p>residual diagnostics</p></li>
+<li><p>measures of influence</p></li>
+<li><p>heteroskedasticity tests</p></li>
+<li><p>collinearity diagnostics</p></li>
+<li><p>model fit assessment</p></li>
+<li><p>variable contribution assessment</p></li>
+<li><p>variable selection procedures</p></li>
+</ul>
+<p>In the code chunk below, the <a href="https://olsrr.rsquaredacademy.com/reference/ols_coll_diag.html"><em>ols_vif_tol()</em></a> of <strong>olsrr</strong> package is used to test if there are sign of multicollinearity.</p>
+<div class="cell">
+
+</div>
+<p>Since the VIF of the independent variables are less than 10. We can safely conclude that there are no sign of multicollinearity among the independent variables.</p>
+</section>
+<section id="test-for-non-linearity" class="level4">
+<h4 class="anchored" data-anchor-id="test-for-non-linearity">Test for Non-Linearity</h4>
+<p>n multiple linear regression, it is important for us to test the assumption that linearity and additivity of the relationship between dependent and independent variables.</p>
+<p>In the code chunk below, the <a href="https://olsrr.rsquaredacademy.com/reference/ols_plot_resid_fit.html"><em>ols_plot_resid_fit()</em></a> of <strong>olsrr</strong> package is used to perform linearity assumption test.</p>
+<div class="cell">
+
+</div>
+<p>The figure above reveals that most of the data points are scattered around the 0 line, hence we can safely conclude that the relationships between the dependent variable and independent variables are linear.</p>
+</section>
+<section id="test-for-normality-assumption" class="level4">
+<h4 class="anchored" data-anchor-id="test-for-normality-assumption">Test for Normality Assumption</h4>
+<p>Lastly, the code chunk below uses <a href="https://olsrr.rsquaredacademy.com/reference/ols_plot_resid_hist.html"><em>ols_plot_resid_hist()</em></a> of <strong>olsrr</strong> package to perform normality assumption test.</p>
+<div class="cell">
+
+</div>
+<p>The summary table above reveals that the p-values of the four tests are way smaller than the alpha value of 0.05. Hence we will reject the null hypothesis that the residual does NOT resemble normal distribution.</p>
+</section>
+<section id="testing-for-spatial-autocorrelation" class="level4">
+<h4 class="anchored" data-anchor-id="testing-for-spatial-autocorrelation">Testing for Spatial Autocorrelation</h4>
+<p>The hedonic model we try to build is using geographically referenced attributes, hence it is also important for us to visualise the residual of the hedonic pricing model.</p>
+<p>In order to perform spatial autocorrelation test, we need to convert <code>condo_resale.sf</code> simple into a SpatialPointsDataFrame.</p>
+<p>First, we will export the residual of the hedonic pricing model and save it as a data frame.</p>
+<div class="cell">
+
+</div>
+<p>Next, we will join the newly created data frame with <code>condo_resale.sf</code> object.</p>
+<div class="cell">
+
+</div>
+<p>Next, we will convert <code>condo_resale.res.sf</code> simple feature object into a SpatialPointsDataFrame because <strong>spdep</strong> package can only process sp conformed spatial data objects.</p>
+<p>The code chunk below will be used to perform the data conversion process.</p>
+<div class="cell">
+
+</div>
+<p>Next, we will use <strong>tmap</strong> package to display the distribution of the residuals on an interactive map.</p>
+<p>The code below will turn on the interactive mode of <strong>tmap</strong>.</p>
+<div class="cell">
+
+</div>
+<p>The code chunk below is used to create an interactive point symbol map.</p>
+<div class="cell">
+
+</div>
+<p>Remember to switch back to “plot” mode before continue.</p>
+<div class="cell">
+
+</div>
+<p>The figure above reveals that there is sign of spatial autocorrelation.</p>
+<p>To proof that our observation is indeed true, the Moran’s I test will be performed</p>
+<p>First, we will compute the distance-based weight matrix by using <a href="https://r-spatial.github.io/spdep/reference/dnearneigh.html"><em>dnearneigh()</em></a> function of <strong>spdep</strong>.</p>
+<div class="cell">
+
+</div>
+<p>Next, <a href="https://r-spatial.github.io/spdep/reference/nb2listw.html"><em>nb2listw()</em></a> of <strong>spdep</strong> packge will be used to convert the output neighbours lists (i.e.&nbsp;<code>nb</code>) into a spatial weights.</p>
+<div class="cell">
+
+</div>
+<p>Next, <a href="https://r-spatial.github.io/spdep/reference/lm.morantest.html"><em>lm.morantest()</em></a> of <strong>spdep</strong> package will be used to perform Moran’s I test for residual spatial autocorrelation.</p>
+<div class="cell">
+
+</div>
+<p>The Global Moran’s I test for residual spatial autocorrelation shows that it’s p-value is less than 2.2e-16 which is less than the alpha value of 0.05. Hence, we will reject the null hypothesis that the residuals are randomly distributed.</p>
+<p>Since the Observed Global Moran I = 0.1424418 which is greater than 0, we can infer than the residuals resemble cluster distribution.</p>
+</section>
+</section>
+</section>
+<section id="building-hedonic-pricing-models-using-gwmodel" class="level2">
+<h2 class="anchored" data-anchor-id="building-hedonic-pricing-models-using-gwmodel">Building Hedonic Pricing Models using GWmodel</h2>
+<p>In this section, we are going to learn to modelling hedonic pricing using both the fixed and adaptive bandwidth schemes.</p>
+<section id="building-fixed-bandwidth-gwr-model" class="level3">
+<h3 class="anchored" data-anchor-id="building-fixed-bandwidth-gwr-model">Building Fixed Bandwidth GWR Model</h3>
+<section id="computing-fixed-bandwith" class="level4">
+<h4 class="anchored" data-anchor-id="computing-fixed-bandwith">Computing fixed bandwith</h4>
+<p>In the code chunk below, <em>bw.gwr()</em> of <strong>GWModel</strong> package is used to determine the optimal fixed bandwidth to use in the model. Notice that the argument <strong><em>adaptive</em></strong> is set to <strong>FALSE</strong> indicates that we are interested to compute the fixed bandwidth.</p>
+<p>There are two possible approaches can be used to determine the stopping rule, they are: CV cross-validation approach and AIC corrected (AICc) approach. We define the stopping rule using <strong><em>approach</em></strong> argument.</p>
+<div class="cell">
+
+</div>
+<p>The result shows that the recommended bandwidth is 971.3398 metres.</p>
+</section>
+<section id="gwmodel-method---fixed-bandwith" class="level4">
+<h4 class="anchored" data-anchor-id="gwmodel-method---fixed-bandwith">GWModel method - fixed bandwith</h4>
+<p>Now we can use the code chunk below to calibrate the gwr model using fixed bandwidth and gaussian kernel.</p>
+<div class="cell">
+
+</div>
+<p>The output is saved in a list of class “gwrm”. The code below can be used to display the model output.</p>
+<div class="cell">
+
+</div>
+<p>The report shows that the adjusted r-square of the gwr is 0.8430 which is significantly better than the global multiple linear regression model of 0.6472.</p>
+</section>
+</section>
+<section id="building-adaptive-bandwidth-gwr-model" class="level3">
+<h3 class="anchored" data-anchor-id="building-adaptive-bandwidth-gwr-model">Building Adaptive Bandwidth GWR Model</h3>
+<p>In this section, we will calibrate the gwr-based hedonic pricing model by using adaptive bandwidth approach.</p>
+<section id="computing-the-adaptive-bandwidth" class="level4">
+<h4 class="anchored" data-anchor-id="computing-the-adaptive-bandwidth">Computing the adaptive bandwidth</h4>
+<p>Similar to the earlier section, we will first use <em>bw.ger()</em> to determine the recommended data point to use.</p>
+<p>The code chunk used looks very similar to the one used to compute the fixed bandwidth except the <strong><em>adaptive</em></strong> argument has changed to <strong>TRUE</strong>.</p>
+<div class="cell">
+
+</div>
+<p>The result shows that the 30 is the recommended data points to be used.</p>
+<p><br>
+</p>
+</section>
+<section id="constructing-the-adaptive-bandwidth-gwr-model" class="level4">
+<h4 class="anchored" data-anchor-id="constructing-the-adaptive-bandwidth-gwr-model">Constructing the adaptive bandwidth gwr model</h4>
+<p>Now, we can go ahead to calibrate the gwr-based hedonic pricing model by using adaptive bandwidth and gaussian kernel as shown in the code chunk below.</p>
+<div class="cell">
+
+</div>
+<p>The code below can be used to display the model output.</p>
+<div class="cell">
+
+</div>
+<p>The report shows that the adjusted r-square of the gwr is 0.8561 which is significantly better than the global multiple linear regression model of 0.6472.</p>
+</section>
+</section>
+<section id="visualising-gwr-output" class="level3">
+<h3 class="anchored" data-anchor-id="visualising-gwr-output">Visualising GWR Output</h3>
+<p>In addition to regression residuals, the output feature class table includes fields for observed and predicted y values, condition number (cond), Local R2, residuals, and explanatory variable coefficients and standard errors:</p>
+<ul>
+<li><p>Condition Number: this diagnostic evaluates local collinearity. In the presence of strong local collinearity, results become unstable. Results associated with condition numbers larger than 30, may be unreliable.</p></li>
+<li><p>Local R2: these values range between 0.0 and 1.0 and indicate how well the local regression model fits observed y values. Very low values indicate the local model is performing poorly. Mapping the Local R2 values to see where GWR predicts well and where it predicts poorly may provide clues about important variables that may be missing from the regression model.</p></li>
+<li><p>Predicted: these are the estimated (or fitted) y values 3. computed by GWR.</p></li>
+<li><p>Residuals: to obtain the residual values, the fitted y values are subtracted from the observed y values. Standardized residuals have a mean of zero and a standard deviation of 1. A cold-to-hot rendered map of standardized residuals can be produce by using these values.</p></li>
+<li><p>Coefficient Standard Error: these values measure the reliability of each coefficient estimate. Confidence in those estimates are higher when standard errors are small in relation to the actual coefficient values. Large standard errors may indicate problems with local collinearity.</p></li>
+</ul>
+<p>They are all stored in a SpatialPointsDataFrame or SpatialPolygonsDataFrame object integrated with fit.points, GWR coefficient estimates, y value, predicted values, coefficient standard errors and t-values in its “data” slot in an object called <strong>SDF</strong> of the output list.</p>
+</section>
+<section id="converting-sdf-into-sf-data.frame" class="level3">
+<h3 class="anchored" data-anchor-id="converting-sdf-into-sf-data.frame">Converting SDF into <strong>sf</strong> data.frame</h3>
+<p>To visualise the fields in <strong>SDF</strong>, we need to first covert it into <strong>sf</strong> data.frame by using the code chunk below.</p>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+</section>
+<section id="visualising-local-r2" class="level3">
+<h3 class="anchored" data-anchor-id="visualising-local-r2">Visualising local R2</h3>
+<p>The code chunks below is used to create an interactive point symbol map.</p>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<section id="by-ura-planning-region" class="level4">
+<h4 class="anchored" data-anchor-id="by-ura-planning-region">By URA Planning Region</h4>
+<div class="cell">
+
+</div>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
