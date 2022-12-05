@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.1.189">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>ISSS624 - Take-home Exercise 2: Regionalisation of Multivariate Water Point Attributes with Non-spatially Constrained and Spatially Constrained Clustering Methods</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">ISSS624</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">Hands-on Exercise</a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise">    
+        <li>
+    <a class="dropdown-item" href="../Hands-on_Ex/Hands-on_Ex1/Hands-on_Ex1.html">
+ <span class="dropdown-text">Hands-on Exercise 1.1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../Hands-on_Ex/Hands-on_Ex1/Hands-on_Ex1_2.html">
+ <span class="dropdown-text">Hands-on Exercise 1.2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../Hands-on_Ex/Hands-on_Ex2/Hands-on_Ex2.html">
+ <span class="dropdown-text">Hands-on Exercise 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../Hands-on_Ex/Hands-on_Ex3/Hands-on_Ex3.html">
+ <span class="dropdown-text">Hands-on Exercise 3</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../Hands-on_Ex/Hands-on_Ex4/Hands-on_Ex4.html">
+ <span class="dropdown-text">Hands-on Exercise 4</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">In-class Exercise</a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
+        <li>
+    <a class="dropdown-item" href="../In-class_Ex/In-class_Ex1/In-class_Ex1.html">
+ <span class="dropdown-text">In-class Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../In-class_Ex/In-class_Ex2.html">
+ <span class="dropdown-text">In-class Exercise 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../In-class_Ex/In-class_Ex3.html">
+ <span class="dropdown-text">In-class Exercise 3</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">Take-home Exercise</a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercise">    
+        <li>
+    <a class="dropdown-item" href="../Take-home_Ex/Take-home_Ex1.html">
+ <span class="dropdown-text">Take-home Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../Take-home_Ex/Take-home_Ex2.html">
+ <span class="dropdown-text">Take-home Exercise 2</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html">Home</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html">About</a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-task" id="toc-the-task" class="nav-link active" data-scroll-target="#the-task">The Task</a>
+  <ul class="collapse">
+  <li><a href="#thematic-mapping" id="toc-thematic-mapping" class="nav-link" data-scroll-target="#thematic-mapping">Thematic Mapping</a></li>
+  <li><a href="#analytical-mapping" id="toc-analytical-mapping" class="nav-link" data-scroll-target="#analytical-mapping">Analytical Mapping</a></li>
+  </ul></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#installing-loading-r-packages" id="toc-installing-loading-r-packages" class="nav-link" data-scroll-target="#installing-loading-r-packages">Installing &amp; Loading R Packages</a></li>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data">The Data</a>
+  <ul class="collapse">
+  <li><a href="#aspatial-data" id="toc-aspatial-data" class="nav-link" data-scroll-target="#aspatial-data">Aspatial data</a></li>
+  <li><a href="#geospatial-data" id="toc-geospatial-data" class="nav-link" data-scroll-target="#geospatial-data">Geospatial data</a></li>
+  <li><a href="#importing-water-point-data" id="toc-importing-water-point-data" class="nav-link" data-scroll-target="#importing-water-point-data">Importing water point data</a></li>
+  <li><a href="#importing-nigeria-lga-level-boundary-data" id="toc-importing-nigeria-lga-level-boundary-data" class="nav-link" data-scroll-target="#importing-nigeria-lga-level-boundary-data">Importing Nigeria LGA level boundary data</a></li>
+  </ul></li>
+  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling">Data Wrangling</a></li>
+  <li><a href="#point-in-polygon-overlay" id="toc-point-in-polygon-overlay" class="nav-link" data-scroll-target="#point-in-polygon-overlay">Point in Polygon Overlay</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Take-home Exercise 2: Regionalisation of Multivariate Water Point Attributes with Non-spatially Constrained and Spatially Constrained Clustering Methods</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<section id="the-task" class="level2">
+<h2 class="anchored" data-anchor-id="the-task">The Task</h2>
+<p>The specific tasks of this take-home exercise are as follows:</p>
+<ul>
+<li><p>Using appropriate <strong>sf</strong> method, import the shapefile into R and save it in a simple feature data frame format. Note that there are three Projected Coordinate Systems of Nigeria, they are: EPSG: 26391, 26392, and 26303. We can use any one of them.</p></li>
+<li><p>Using appropriate <strong>tidyr</strong> and <strong>dplyr</strong> methods, derive the proportion of functional and non-functional water point at LGA level (i.e.&nbsp;ADM2).</p></li>
+<li><p>Combining the geospatial and aspatial data frame into simple feature data frame.</p></li>
+<li><p>Delineating water point measures functional regions by using conventional hierarchical clustering.</p></li>
+<li><p>Delineating water point measures functional regions by using spatially constrained clustering algorithms.</p></li>
+</ul>
+<section id="thematic-mapping" class="level3">
+<h3 class="anchored" data-anchor-id="thematic-mapping">Thematic Mapping</h3>
+<ul>
+<li>Plot to show the water points measures derived by using appropriate statistical graphics and choropleth mapping technique.</li>
+</ul>
+</section>
+<section id="analytical-mapping" class="level3">
+<h3 class="anchored" data-anchor-id="analytical-mapping">Analytical Mapping</h3>
+<ul>
+<li>Plot functional regions delineated by using both non-spatially constrained and spatially constrained clustering algorithms.</li>
+</ul>
+</section>
+</section>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>The process of creating regions is called <a href="https://www.researchgate.net/publication/28153673_Supervised_Regionalization_Methods_A_Survey/link/0fcfd5094046b13d35000000/download">regionalisation</a>. A regionalisation is a special kind of clustering where the objective is to group observations which are similar in their statistical attributes, but also in their spatial location.</p>
+<p>In this take-home exercise, we are required to regionalise Nigeria by using, but not limited to the following measures:</p>
+<ul>
+<li><p>Total number of functional water points</p></li>
+<li><p>Total number of nonfunctional water points</p></li>
+<li><p>Percentage of functional water points</p></li>
+<li><p>Percentage of non-functional water points</p></li>
+<li><p>Percentage of main water point technology (i.e.&nbsp;Hand Pump)</p></li>
+<li><p>Percentage of usage capacity (i.e.&nbsp;&lt; 1000, &gt;=1000)</p></li>
+<li><p>Percentage of rural water points</p></li>
+</ul>
+</section>
+<section id="installing-loading-r-packages" class="level2">
+<h2 class="anchored" data-anchor-id="installing-loading-r-packages">Installing &amp; Loading R Packages</h2>
+<p>In the code chunk below, <em>p_load()</em> of <strong>pacman</strong> package is used to install and load the following R packages into R environment.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="the-data" class="level2">
+<h2 class="anchored" data-anchor-id="the-data">The Data</h2>
+<section id="aspatial-data" class="level3">
+<h3 class="anchored" data-anchor-id="aspatial-data">Aspatial data</h3>
+<p>For the purpose of this exercise, data from <a href="https://www.waterpointdata.org/access-data/">WPdx Global Data Repositories</a> will be used. There are two versions of the data. They are: WPdx-Basic and WPdx+. We are required to use WPdx+ data set.</p>
+</section>
+<section id="geospatial-data" class="level3">
+<h3 class="anchored" data-anchor-id="geospatial-data">Geospatial data</h3>
+<p>Nigeria Level-2 Administrative Boundary (also known as Local Government Area) polygon features GIS data will be used in this exercise. The data can be downloaded either from The <a href="https://data.humdata.org/">Humanitarian Data Exchange</a> portal or <a href="https://www.geoboundaries.org/">geoBoundaries</a>.</p>
+</section>
+<section id="importing-water-point-data" class="level3">
+<h3 class="anchored" data-anchor-id="importing-water-point-data">Importing water point data</h3>
+<p>First, we are going to import the water point data into R environment.</p>
+<div class="cell">
+
+</div>
+<p>Thing to learn from the code chunk above:</p>
+<ul>
+<li><p>The original file name is called <code>Water_Point_Data_Exchange_-_PlusWPdx.csv</code>, it has been rename to <code>WPdx.csv</code> for easy encoding.</p></li>
+<li><p>Instead of using <em>read.csv()</em> of Base R to import the csv file into R, <em>read_csv()</em> is <strong>readr</strong> package is used. This is because during the initial data exploration, we notice that there is at least one field name with space between the field name (ie. <em>New Georeferenced Column</em>).</p></li>
+<li><p>The data file contains water point data of many countries. In this study, we are interested on water point in Nigeria. Hence, <em>filter()</em> of <strong>dplyr</strong> is used to extract out records belonging to Nigeria only.</p></li>
+</ul>
+<p>Next, <em>write_rds()</em> of <strong>readr</strong> package is used to save the extracted data table (i.e.&nbsp;<code>wp</code>) into an output file in rds data format. The output file is called <code>wpdx_nga.rds</code> and it is saved in rawdata sub-folder, which will not be uploaded to Git.</p>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<section id="convert-wkt-data" class="level4">
+<h4 class="anchored" data-anchor-id="convert-wkt-data">Convert wkt data</h4>
+<p>After the data are imported into R environment, it is a good practice to review both the data structure and the data table if it is in tibble data frame format in R Studio.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 95,008 × 70
+   row_id `#source`      #lat_…¹ #lon_…² #repo…³ #stat…⁴ #wate…⁵ #wate…⁶ #wate…⁷
+    &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 1 429068 GRID3             7.98    5.12 08/29/… Unknown &lt;NA&gt;    &lt;NA&gt;    Tapsta…
+ 2 222071 Federal Minis…    6.96    3.60 08/16/… Yes     Boreho… Well    Mechan…
+ 3 160612 WaterAid          6.49    7.93 12/04/… Yes     Boreho… Well    Hand P…
+ 4 160669 WaterAid          6.73    7.65 12/04/… Yes     Boreho… Well    &lt;NA&gt;   
+ 5 160642 WaterAid          6.78    7.66 12/04/… Yes     Boreho… Well    Hand P…
+ 6 160628 WaterAid          6.96    7.78 12/04/… Yes     Boreho… Well    Hand P…
+ 7 160632 WaterAid          7.02    7.84 12/04/… Yes     Boreho… Well    Hand P…
+ 8 642747 Living Water …    7.33    8.98 10/03/… Yes     Boreho… Well    Mechan…
+ 9 642456 Living Water …    7.17    9.11 10/03/… Yes     Boreho… Well    Hand P…
+10 641347 Living Water …    7.20    9.22 03/28/… Yes     Boreho… Well    Hand P…
+# … with 94,998 more rows, 61 more variables: `#water_tech_category` &lt;chr&gt;,
+#   `#facility_type` &lt;chr&gt;, `#clean_country_name` &lt;chr&gt;, `#clean_adm1` &lt;chr&gt;,
+#   `#clean_adm2` &lt;chr&gt;, `#clean_adm3` &lt;chr&gt;, `#clean_adm4` &lt;chr&gt;,
+#   `#install_year` &lt;dbl&gt;, `#installer` &lt;chr&gt;, `#rehab_year` &lt;lgl&gt;,
+#   `#rehabilitator` &lt;lgl&gt;, `#management_clean` &lt;chr&gt;, `#status_clean` &lt;chr&gt;,
+#   `#pay` &lt;chr&gt;, `#fecal_coliform_presence` &lt;chr&gt;,
+#   `#fecal_coliform_value` &lt;dbl&gt;, `#subjective_quality` &lt;chr&gt;, …</code></pre>
+</div>
+</div>
+<p>Notice that the newly imported tibble data frame (i.e.&nbsp;<code>wpdx_nga</code>) contains a field called <code>New Georeferenced Column</code> which represent spatial data in a textual format. In fact, this kind of text file is popularly known as <strong>Well Known Text</strong> in short <strong>wkt</strong>.</p>
+<p>Two steps will be used to convert an asptial data file in wkt format into a sf data frame by using <strong>sf</strong>.</p>
+<p>First, <em>st_as_sfc()</em> of <strong>sf</strong> package is used to derive a new field called <code>Geometry</code> as shown in the code chunk below.</p>
+<div class="cell">
+
+</div>
+<p>If we check the <code>wpdx_nga</code> data frame and scroll to the last field now, we will see a new field called <code>Geometry</code> has been added.</p>
+<p>Next, <em>st_sf()</em> will be used to convert the tibble data frame into sf data frame.</p>
+<div class="cell">
+
+</div>
+<p>The code chunk below reveals the complete information of a feature object by using <a href="https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/head"><em>head()</em></a> of Base R.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 5 features and 70 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 3.597668 ymin: 6.48694 xmax: 7.92972 ymax: 7.98
+Geodetic CRS:  WGS 84
+# A tibble: 5 × 71
+  row_id #sour…¹ #lat_…² #lon_…³ #repo…⁴ #stat…⁵ #wate…⁶ #wate…⁷ #wate…⁸ #wate…⁹
+   &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+1 429068 GRID3      7.98    5.12 08/29/… Unknown &lt;NA&gt;    &lt;NA&gt;    Tapsta… Tapsta…
+2 222071 Federa…    6.96    3.60 08/16/… Yes     Boreho… Well    Mechan… Mechan…
+3 160612 WaterA…    6.49    7.93 12/04/… Yes     Boreho… Well    Hand P… Hand P…
+4 160669 WaterA…    6.73    7.65 12/04/… Yes     Boreho… Well    &lt;NA&gt;    &lt;NA&gt;   
+5 160642 WaterA…    6.78    7.66 12/04/… Yes     Boreho… Well    Hand P… Hand P…
+# … with 61 more variables: `#facility_type` &lt;chr&gt;,
+#   `#clean_country_name` &lt;chr&gt;, `#clean_adm1` &lt;chr&gt;, `#clean_adm2` &lt;chr&gt;,
+#   `#clean_adm3` &lt;chr&gt;, `#clean_adm4` &lt;chr&gt;, `#install_year` &lt;dbl&gt;,
+#   `#installer` &lt;chr&gt;, `#rehab_year` &lt;lgl&gt;, `#rehabilitator` &lt;lgl&gt;,
+#   `#management_clean` &lt;chr&gt;, `#status_clean` &lt;chr&gt;, `#pay` &lt;chr&gt;,
+#   `#fecal_coliform_presence` &lt;chr&gt;, `#fecal_coliform_value` &lt;dbl&gt;,
+#   `#subjective_quality` &lt;chr&gt;, `#activity_id` &lt;chr&gt;, `#scheme_id` &lt;chr&gt;, …</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="importing-nigeria-lga-level-boundary-data" class="level3">
+<h3 class="anchored" data-anchor-id="importing-nigeria-lga-level-boundary-data">Importing Nigeria LGA level boundary data</h3>
+<p>For the purpose of this exercise, shapefile downloaded from <a href="https://www.geoboundaries.org/">geoBoundaries</a> portal will be used.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `geoBoundaries-NGA-ADM2' from data source 
+  `C:\Jacobche\ISSS624\Take-home_Ex\data' using driver `ESRI Shapefile'
+Simple feature collection with 774 features and 5 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 2.668534 ymin: 4.273007 xmax: 14.67882 ymax: 13.89442
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="data-wrangling" class="level2">
+<h2 class="anchored" data-anchor-id="data-wrangling">Data Wrangling</h2>
+<p>The code chunk below (as used by <a href="https://jordan-isss624-geospatial.netlify.app/posts/geo/geospatial_exercise/#data-wrangling">Jordan</a>) uses <em>duplicated()</em> of base R which has identified 12 LGAs (ie <code>shapeName</code>) having duplicates.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Bassa"    "Bassa"    "Ifelodun" "Ifelodun" "Irepodun" "Irepodun"
+ [7] "Nasarawa" "Nasarawa" "Obi"      "Obi"      "Surulere" "Surulere"</code></pre>
+</div>
+</div>
+<p>After some research, the corrected index and shapeName should be as follows:</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Index</th>
+<th>shapeName</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>94</td>
+<td>Bassa Kogi</td>
+</tr>
+<tr class="even">
+<td>95</td>
+<td>Bassa Plateau</td>
+</tr>
+<tr class="odd">
+<td>304</td>
+<td>Ifelodun Kwara</td>
+</tr>
+<tr class="even">
+<td>305</td>
+<td>Ifelodun Osun</td>
+</tr>
+<tr class="odd">
+<td>355</td>
+<td>Irepodun Kwara</td>
+</tr>
+<tr class="even">
+<td>356</td>
+<td>Irepodun Osun</td>
+</tr>
+<tr class="odd">
+<td>519</td>
+<td>Nasarawa Kano</td>
+</tr>
+<tr class="even">
+<td>520</td>
+<td>Nasarawa</td>
+</tr>
+<tr class="odd">
+<td>546</td>
+<td>Obi Benue</td>
+</tr>
+<tr class="even">
+<td>547</td>
+<td>Obi Nasarawa</td>
+</tr>
+<tr class="odd">
+<td>693</td>
+<td>Surulere Lagos</td>
+</tr>
+<tr class="even">
+<td>694</td>
+<td>Surulere Oyo</td>
+</tr>
+</tbody>
+</table>
+<p>The code chunk below is used to correct the respective <code>shapeName</code> values.</p>
+<div class="cell">
+
+</div>
+<p>The code chunk below uses <em>length()</em> of base R to validate that there are no more duplicates in LGAs.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+</div>
+</section>
+<section id="point-in-polygon-overlay" class="level2">
+<h2 class="anchored" data-anchor-id="point-in-polygon-overlay">Point in Polygon Overlay</h2>
+<p>Although <code>wpdx_sf</code> sf data frame consists of a field called <code>#clean_adm2</code> which by right should provide the LGA names of the water points located. However, it is always a good practice to be more causcious when dealing with data accuracy.</p>
+<p>In this section, we are going to use a geoprocessing function (or commonly know as GIS analysis) called <strong>point-in-polygon overlay</strong> to transfer the attribute information in <code>nga</code> sf data frame into <code>wpdx_sf</code> data frame. The code chunk below uses <em>st_join()</em> of <strong>sf</strong> package to perform a join and a new field called <code>shapeName</code> is now added to <code>wpdx_sf</code> sf data frame.</p>
+<div class="cell">
+
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
