@@ -140,7 +140,7 @@ nga <- st_read(dsn = "data",
   select(shapeName)
 ```
 
-## Data Wrangling
+### Correcting duplicated LGAs
 
 The code chunk below (as used by [Jordan](https://jordan-isss624-geospatial.netlify.app/posts/geo/geospatial_exercise/#data-wrangling)) uses *duplicated()* of base R which has identified 12 LGAs (ie `shapeName`) having duplicates.
 
@@ -192,4 +192,132 @@ In this section, we are going to use a geoprocessing function (or commonly know 
 
 ```{r}
 wpdx_sf <- st_join(wpdx_sf, nga)
+```
+
+## Data Wrangling
+
+### Recoding NA values into string
+
+In the code chunk below, *replace_na()* is used to recode all the *NA* values in `#status_clean` and `#water_tech_category` fields into *Unknown*.
+
+```{r}
+wpdx_sf <- wpdx_sf %>%
+  mutate(`#status_clean` = replace_na(`#status_clean`, "Unknown")) %>%
+  mutate(`#water_tech_category` = replace_na(`#water_tech_category`, "Unknown"))
+```
+
+### Extracting useful data points
+
+In the code chunk below, *filter()* of **dplyr** is used to select water points of various `#status_clean`.
+
+```{r}
+func_wp <- wpdx_sf %>%
+  filter(`#status_clean` %in%
+           c("Functional",
+             "Functional but not in use",
+             "Functional but needs repair"))
+```
+
+```{r}
+nonfunc_wp <- wpdx_sf %>%
+  filter(`#status_clean` %in%
+           c("Abandoned/Decommissioned",
+             "Abandoned",
+             "Non-Functional",
+             "Non functional due to dry season",
+             "Non-Functional due to dry season"))
+```
+
+```{r}
+unknown_wp <- wpdx_sf %>%
+  filter(`#status_clean` == "Unknown")
+```
+
+In the code chunk below, we will check the proportions in `#water-tech-category` and then use *filter()* of **dplyr** to select water points of sizable proportions.
+
+```{r}
+
+data_1 <- wpdx_sf %>%
+  group_by(`#water_tech_category`) %>%
+  summarise(count = n())
+
+ggplot(data_1, aes(x = "", y = count, fill = `#water_tech_category`)) +
+  geom_col(color = "black") +
+  geom_label(aes(label = count),
+             color = "white",
+             position = position_stack(vjust = 0.5),
+             show.legend = FALSE) +
+  coord_polar(theta = "y")
+```
+
+```{r}
+handpump_wp <- wpdx_sf %>%
+  filter(`#water_tech_category` == "Hand Pump")
+
+mechanized_wp <- wpdx_sf %>%
+  filter(`#water_tech_category` == "Mechanized Pump")
+```
+
+In the code chunk below, *filter()* of **dplyr** is used to select water points of `usage_capacity` \>=1000 and those \<1000.
+
+```{r}
+highusage_wp <- wpdx_sf %>%
+  filter(usage_capacity >= 1000)
+
+lowusage_wp <- wpdx_sf %>%
+  filter(usage_capacity < 1000)
+```
+
+In the code chunk below, *filter()* of **dplyr** is used to select water points of `is_urban` = False and those = True.
+
+```{r}
+rural_wp <- wpdx_sf %>%
+  filter(is_urban == FALSE)
+
+urban_wp <- wpdx_sf %>%
+  filter(is_urban  == TRUE)
+```
+
+### Performing Point-in-Polygon Count
+
+The code chunk below performs two operations at one go. Firstly, identify water points located inside each LGA by using [*st_intersects()*](https://r-spatial.github.io/sf/reference/geos_binary_pred.html). Next, [*length()*](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/length) of Base R is used to calculate numbers of water points that fall inside each LGA.
+
+```{r}
+nga_wp <- nga %>% 
+  mutate(total_wp = lengths(
+    st_intersects(nga, wpdx_sf))) %>%
+  mutate(func_wp = lengths(
+    st_intersects(nga, func_wp))) %>%
+  mutate(nonfunc_wp = lengths(
+    st_intersects(nga, nonfunc_wp))) %>%
+  mutate(unknown_wp = lengths(
+    st_intersects(nga, unknown_wp))) %>%
+  mutate(handpump_wp = lengths(
+    st_intersects(nga, handpump_wp))) %>%
+  mutate(mechanized_wp = lengths(
+    st_intersects(nga, mechanized_wp))) %>%
+  mutate(highusage_wp = lengths(
+    st_intersects(nga, highusage_wp))) %>%
+  mutate(lowusage_wp = lengths(
+    st_intersects(nga, lowusage_wp))) %>%
+  mutate(rural_wp = lengths(
+    st_intersects(nga, rural_wp))) %>%
+  mutate(urban_wp = lengths(
+    st_intersects(nga, urban_wp)))
+```
+
+### Derive new variables using **dplyr** package
+
+```{r}
+nga_wp_derived <- nga_wp %>%
+  mutate(func_perc = func_wp/total_wp) %>%
+  mutate(nonfunc_perc = nonfunc_wp/total_wp) %>%
+  mutate(handpump_perc = handpump_wp/total_wp) %>%
+  mutate(mechanized_perc = mechanized_wp/total_wp) %>%
+  mutate(highusag_perc = highusage_wp/total_wp) %>%
+  mutate(lowusage_perc = lowusage_wp/total_wp) %>%
+  mutate(rural_perc = rural_wp/total_wp) %>%
+  mutate(urban_perc = urban_wp/total_wp) %>% 
+  select(1:2, 4:5, 13:20)
+
 ```

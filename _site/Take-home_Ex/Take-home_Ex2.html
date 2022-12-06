@@ -170,9 +170,16 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#geospatial-data" id="toc-geospatial-data" class="nav-link" data-scroll-target="#geospatial-data">Geospatial data</a></li>
   <li><a href="#importing-water-point-data" id="toc-importing-water-point-data" class="nav-link" data-scroll-target="#importing-water-point-data">Importing water point data</a></li>
   <li><a href="#importing-nigeria-lga-level-boundary-data" id="toc-importing-nigeria-lga-level-boundary-data" class="nav-link" data-scroll-target="#importing-nigeria-lga-level-boundary-data">Importing Nigeria LGA level boundary data</a></li>
+  <li><a href="#correcting-duplicated-lgas" id="toc-correcting-duplicated-lgas" class="nav-link" data-scroll-target="#correcting-duplicated-lgas">Correcting duplicated LGAs</a></li>
   </ul></li>
-  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling">Data Wrangling</a></li>
   <li><a href="#point-in-polygon-overlay" id="toc-point-in-polygon-overlay" class="nav-link" data-scroll-target="#point-in-polygon-overlay">Point in Polygon Overlay</a></li>
+  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling">Data Wrangling</a>
+  <ul class="collapse">
+  <li><a href="#recoding-na-values-into-string" id="toc-recoding-na-values-into-string" class="nav-link" data-scroll-target="#recoding-na-values-into-string">Recoding NA values into string</a></li>
+  <li><a href="#extracting-useful-data-points" id="toc-extracting-useful-data-points" class="nav-link" data-scroll-target="#extracting-useful-data-points">Extracting useful data points</a></li>
+  <li><a href="#performing-point-in-polygon-count" id="toc-performing-point-in-polygon-count" class="nav-link" data-scroll-target="#performing-point-in-polygon-count">Performing Point-in-Polygon Count</a></li>
+  <li><a href="#derive-new-variables-using-dplyr-package" id="toc-derive-new-variables-using-dplyr-package" class="nav-link" data-scroll-target="#derive-new-variables-using-dplyr-package">Derive new variables using <strong>dplyr</strong> package</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -348,9 +355,8 @@ Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
 </section>
-</section>
-<section id="data-wrangling" class="level2">
-<h2 class="anchored" data-anchor-id="data-wrangling">Data Wrangling</h2>
+<section id="correcting-duplicated-lgas" class="level3">
+<h3 class="anchored" data-anchor-id="correcting-duplicated-lgas">Correcting duplicated LGAs</h3>
 <p>The code chunk below (as used by <a href="https://jordan-isss624-geospatial.netlify.app/posts/geo/geospatial_exercise/#data-wrangling">Jordan</a>) uses <em>duplicated()</em> of base R which has identified 12 LGAs (ie <code>shapeName</code>) having duplicates.</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
@@ -428,6 +434,7 @@ Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
 </section>
+</section>
 <section id="point-in-polygon-overlay" class="level2">
 <h2 class="anchored" data-anchor-id="point-in-polygon-overlay">Point in Polygon Overlay</h2>
 <p>Although <code>wpdx_sf</code> sf data frame consists of a field called <code>#clean_adm2</code> which by right should provide the LGA names of the water points located. However, it is always a good practice to be more causcious when dealing with data accuracy.</p>
@@ -435,8 +442,61 @@ Geodetic CRS:  WGS 84</code></pre>
 <div class="cell">
 
 </div>
+</section>
+<section id="data-wrangling" class="level2">
+<h2 class="anchored" data-anchor-id="data-wrangling">Data Wrangling</h2>
+<section id="recoding-na-values-into-string" class="level3">
+<h3 class="anchored" data-anchor-id="recoding-na-values-into-string">Recoding NA values into string</h3>
+<p>In the code chunk below, <em>replace_na()</em> is used to recode all the <em>NA</em> values in <code>#status_clean</code> and <code>#water_tech_category</code> fields into <em>Unknown</em>.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="extracting-useful-data-points" class="level3">
+<h3 class="anchored" data-anchor-id="extracting-useful-data-points">Extracting useful data points</h3>
+<p>In the code chunk below, <em>filter()</em> of <strong>dplyr</strong> is used to select water points of various <code>#status_clean</code>.</p>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<p>In the code chunk below, we will check the proportions in <code>#water-tech-category</code> and then use <em>filter()</em> of <strong>dplyr</strong> to select water points of sizable proportions.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Take-home_Ex2_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+
+</div>
+<p>In the code chunk below, <em>filter()</em> of <strong>dplyr</strong> is used to select water points of <code>usage_capacity</code> &gt;=1000 and those &lt;1000.</p>
+<div class="cell">
+
+</div>
+<p>In the code chunk below, <em>filter()</em> of <strong>dplyr</strong> is used to select water points of <code>is_urban</code> = False and those = True.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="performing-point-in-polygon-count" class="level3">
+<h3 class="anchored" data-anchor-id="performing-point-in-polygon-count">Performing Point-in-Polygon Count</h3>
+<p>The code chunk below performs two operations at one go. Firstly, identify water points located inside each LGA by using <a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html"><em>st_intersects()</em></a>. Next, <a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/length"><em>length()</em></a> of Base R is used to calculate numbers of water points that fall inside each LGA.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="derive-new-variables-using-dplyr-package" class="level3">
+<h3 class="anchored" data-anchor-id="derive-new-variables-using-dplyr-package">Derive new variables using <strong>dplyr</strong> package</h3>
+<div class="cell">
+
+</div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
