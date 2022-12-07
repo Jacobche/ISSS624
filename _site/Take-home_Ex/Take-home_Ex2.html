@@ -180,6 +180,12 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#performing-point-in-polygon-count" id="toc-performing-point-in-polygon-count" class="nav-link" data-scroll-target="#performing-point-in-polygon-count">Performing Point-in-Polygon Count</a></li>
   <li><a href="#derive-new-variables-using-dplyr-package" id="toc-derive-new-variables-using-dplyr-package" class="nav-link" data-scroll-target="#derive-new-variables-using-dplyr-package">Derive new variables using <strong>dplyr</strong> package</a></li>
   </ul></li>
+  <li><a href="#exploratory-data-analysis-eda" id="toc-exploratory-data-analysis-eda" class="nav-link" data-scroll-target="#exploratory-data-analysis-eda">Exploratory Data Analysis (EDA)</a>
+  <ul class="collapse">
+  <li><a href="#eda-using-statistical-graphics" id="toc-eda-using-statistical-graphics" class="nav-link" data-scroll-target="#eda-using-statistical-graphics">EDA using statistical graphics</a></li>
+  <li><a href="#eda-using-choropleth-map" id="toc-eda-using-choropleth-map" class="nav-link" data-scroll-target="#eda-using-choropleth-map">EDA using choropleth map</a></li>
+  </ul></li>
+  <li><a href="#correlation-analysis" id="toc-correlation-analysis" class="nav-link" data-scroll-target="#correlation-analysis">Correlation Analysis</a></li>
   </ul>
 </nav>
     </div>
@@ -464,7 +470,7 @@ Geodetic CRS:  WGS 84</code></pre>
 <div class="cell">
 
 </div>
-<p>In the code chunk below, we will check the proportions in <code>#water-tech-category</code> and then use <em>filter()</em> of <strong>dplyr</strong> to select water points of sizable proportions.</p>
+<p>In the code chunk below, we will check the proportions in <code>#water-tech-category</code> and then use <em>filter()</em> of <strong>dplyr</strong> to select only the water points of sizable proportions.</p>
 <div class="cell">
 <div class="cell-output-display">
 <p><img src="Take-home_Ex2_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
@@ -488,15 +494,121 @@ Geodetic CRS:  WGS 84</code></pre>
 <div class="cell">
 
 </div>
+<p>The code chunk below reveal the summary statistics of <strong>nga_wp</strong> data frame.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>  shapeName                  geometry      total_wp        func_wp      
+ Length:774         MULTIPOLYGON :774   Min.   :  0.0   Min.   :  0.00  
+ Class :character   epsg:4326    :  0   1st Qu.: 45.0   1st Qu.: 17.00  
+ Mode  :character   +proj=long...:  0   Median : 96.0   Median : 45.50  
+                                        Mean   :122.7   Mean   : 67.36  
+                                        3rd Qu.:168.8   3rd Qu.: 87.75  
+                                        Max.   :894.0   Max.   :752.00  
+   nonfunc_wp       unknown_wp      handpump_wp     mechanized_wp   
+ Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
+ 1st Qu.: 12.25   1st Qu.:  0.00   1st Qu.:  6.00   1st Qu.: 11.00  
+ Median : 34.00   Median :  0.00   Median : 47.00   Median : 25.50  
+ Mean   : 41.60   Mean   : 13.76   Mean   : 75.89   Mean   : 33.12  
+ 3rd Qu.: 60.75   3rd Qu.: 17.75   3rd Qu.:111.00   3rd Qu.: 46.00  
+ Max.   :278.00   Max.   :219.00   Max.   :764.00   Max.   :245.00  
+  highusage_wp     lowusage_wp        rural_wp         urban_wp     
+ Min.   :  0.00   Min.   :  0.00   Min.   :  0.00   Min.   :  0.00  
+ 1st Qu.: 11.00   1st Qu.: 16.00   1st Qu.: 23.00   1st Qu.:  0.00  
+ Median : 25.50   Median : 60.00   Median : 64.00   Median :  9.00  
+ Mean   : 33.12   Mean   : 89.59   Mean   : 97.45   Mean   : 25.27  
+ 3rd Qu.: 46.00   3rd Qu.:127.75   3rd Qu.:141.00   3rd Qu.: 33.00  
+ Max.   :245.00   Max.   :767.00   Max.   :894.00   Max.   :324.00  </code></pre>
+</div>
+</div>
 </section>
 <section id="derive-new-variables-using-dplyr-package" class="level3">
 <h3 class="anchored" data-anchor-id="derive-new-variables-using-dplyr-package">Derive new variables using <strong>dplyr</strong> package</h3>
+<p>The unit of measurement of the values are number of water points. Using these values directly will be biased towards the underlying total number of water points. In order to overcome this problem, we will derive the percentages of each variable by using the code chunk below.</p>
 <div class="cell">
 
 </div>
+<p>We notice there are some NA values in the <strong>nga_wp_derived</strong> data frame. As such, <em>is.na()</em> of base R is used to replace NA with 0.</p>
+<div class="cell">
 
-
+</div>
+<p>Let us review the summary statistics of the newly derived variables using the code chunk below.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>  shapeName            func_wp         nonfunc_wp       func_perc     
+ Length:774         Min.   :  0.00   Min.   :  0.00   Min.   :0.0000  
+ Class :character   1st Qu.: 17.00   1st Qu.: 12.25   1st Qu.:0.3261  
+ Mode  :character   Median : 45.50   Median : 34.00   Median :0.4741  
+                    Mean   : 67.36   Mean   : 41.60   Mean   :0.4984  
+                    3rd Qu.: 87.75   3rd Qu.: 60.75   3rd Qu.:0.6699  
+                    Max.   :752.00   Max.   :278.00   Max.   :1.0000  
+  nonfunc_perc    handpump_perc    mechanized_perc  highusage_perc  
+ Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000  
+ 1st Qu.:0.2105   1st Qu.:0.1670   1st Qu.:0.1220   1st Qu.:0.1220  
+ Median :0.3505   Median :0.5099   Median :0.3127   Median :0.3127  
+ Mean   :0.3592   Mean   :0.4873   Mean   :0.3754   Mean   :0.3754  
+ 3rd Qu.:0.5076   3rd Qu.:0.7778   3rd Qu.:0.5771   3rd Qu.:0.5771  
+ Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   Max.   :1.0000  
+ lowusage_perc      rural_perc       urban_perc              geometry  
+ Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   MULTIPOLYGON :774  
+ 1st Qu.:0.3968   1st Qu.:0.5727   1st Qu.:0.0000   epsg:4326    :  0  
+ Median :0.6703   Median :0.8645   Median :0.1195   +proj=long...:  0  
+ Mean   :0.6078   Mean   :0.7271   Mean   :0.2561                      
+ 3rd Qu.:0.8735   3rd Qu.:1.0000   3rd Qu.:0.3844                      
+ Max.   :1.0000   Max.   :1.0000   Max.   :1.0000                      </code></pre>
+</div>
+</div>
 </section>
+</section>
+<section id="exploratory-data-analysis-eda" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis-eda">Exploratory Data Analysis (EDA)</h2>
+<section id="eda-using-statistical-graphics" class="level3">
+<h3 class="anchored" data-anchor-id="eda-using-statistical-graphics">EDA using statistical graphics</h3>
+<p>The code below uses <a href="https://rpkgs.datanovia.com/ggpubr/reference/ggarrange.html"><em>ggarange()</em></a> function of <a href="https://rpkgs.datanovia.com/ggpubr/"><strong>ggpubr</strong></a> package to compute multiple histograms so as to reveal the distribution of the selected variables in the <strong>nga_wp_derived</strong> data frame.</p>
+<div class="cell">
+
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Take-home_Ex2_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>From the above, we can observe that <code>func_perc</code> and <code>nonfunc_perc</code> are more normally distributed compared to other variables.</p>
+</section>
+<section id="eda-using-choropleth-map" class="level3">
+<h3 class="anchored" data-anchor-id="eda-using-choropleth-map">EDA using choropleth map</h3>
+<p>To have a quick look at the distribution of functional water points percentage of Nigeria at LGA level, a choropleth map will be prepared.</p>
+<p>The code chunk below is used to prepare the choropleth by using the <em>qtm()</em> function of <strong>tmap</strong> package.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Take-home_Ex2_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>In order to reveal the distribution shown in the choropleth map above are biased towards the underlying number of functional water points at the LGAs, we will create two choropleth maps, one for the number of fucntional water points(i.e.&nbsp;<code>func.map</code>) and one for the percentage of functional water points (f<code>unc_perc.map</code>) by using the code chunk below.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Take-home_Ex2_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Notice that there are areas with high proportions of functional water points but the actual number of functional water points are low.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Take-home_Ex2_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The same observation also holds for non-functional water points aspect where there are high areas with high proportions of non-functional water points but the actual number of non-functional water points are low.</p>
+</section>
+</section>
+<section id="correlation-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="correlation-analysis">Correlation Analysis</h2>
+<p>Before we perform cluster analysis, it is important for us to ensure that the cluster variables are not highly correlated. The code below uses <a href="https://cran.r-project.org/web/packages/corrplot/corrplot.pdf"><em>corrplot.mixed()</em></a> function of <a href="https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html"><strong>corrplot</strong></a> package to visualise and analyse the correlation of the input variables.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Take-home_Ex2_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The correlation plot above shows that <code>mechanised_perc</code> and <code>highusage_perc</code> are highly correlated, and similar high correlation is also spotted in <code>handpump_perc</code> and <code>lowusage_perc</code>. This suggests that only one of them in each pair should be used in the cluster analysis instead of both.</p>
+
+
 </section>
 
 </main> <!-- /main -->

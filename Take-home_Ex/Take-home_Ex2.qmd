@@ -54,7 +54,7 @@ In this take-home exercise, we are required to regionalise Nigeria by using, but
 In the code chunk below, *p_load()* of **pacman** package is used to install and load the following R packages into R environment.
 
 ```{r}
-pacman::p_load(sf, tidyverse, tmap, spdep)
+pacman::p_load(sf, tidyverse, tmap, spdep, ggpubr, corrplot)
 ```
 
 ## The Data
@@ -233,7 +233,7 @@ unknown_wp <- wpdx_sf %>%
   filter(`#status_clean` == "Unknown")
 ```
 
-In the code chunk below, we will check the proportions in `#water-tech-category` and then use *filter()* of **dplyr** to select water points of sizable proportions.
+In the code chunk below, we will check the proportions in `#water-tech-category` and then use *filter()* of **dplyr** to select only the water points of sizable proportions.
 
 ```{r}
 
@@ -306,7 +306,15 @@ nga_wp <- nga %>%
     st_intersects(nga, urban_wp)))
 ```
 
+The code chunk below reveal the summary statistics of **nga_wp** data frame.
+
+```{r}
+summary(nga_wp)
+```
+
 ### Derive new variables using **dplyr** package
+
+The unit of measurement of the values are number of water points. Using these values directly will be biased towards the underlying total number of water points. In order to overcome this problem, we will derive the percentages of each variable by using the code chunk below.
 
 ```{r}
 nga_wp_derived <- nga_wp %>%
@@ -314,10 +322,176 @@ nga_wp_derived <- nga_wp %>%
   mutate(nonfunc_perc = nonfunc_wp/total_wp) %>%
   mutate(handpump_perc = handpump_wp/total_wp) %>%
   mutate(mechanized_perc = mechanized_wp/total_wp) %>%
-  mutate(highusag_perc = highusage_wp/total_wp) %>%
+  mutate(highusage_perc = highusage_wp/total_wp) %>%
   mutate(lowusage_perc = lowusage_wp/total_wp) %>%
   mutate(rural_perc = rural_wp/total_wp) %>%
   mutate(urban_perc = urban_wp/total_wp) %>% 
   select(1:2, 4:5, 13:20)
 
 ```
+
+We notice there are some NA values in the **nga_wp_derived** data frame. As such, *is.na()* of base R is used to replace NA with 0.
+
+```{r}
+nga_wp_derived[is.na(nga_wp_derived)] = 0
+```
+
+Let us review the summary statistics of the newly derived variables using the code chunk below.
+
+```{r}
+summary(nga_wp_derived)
+```
+
+## Exploratory Data Analysis (EDA)
+
+### EDA using statistical graphics
+
+The code below uses [*ggarange()*](https://rpkgs.datanovia.com/ggpubr/reference/ggarrange.html) function of [**ggpubr**](https://rpkgs.datanovia.com/ggpubr/) package to compute multiple histograms so as to reveal the distribution of the selected variables in the **nga_wp_derived** data frame.
+
+```{r}
+func_wp <- ggplot(data=nga_wp_derived, 
+             aes(x= func_wp)) +
+  geom_histogram(bins=20, 
+                 color="black", 
+                 fill="light blue")
+
+nonfunc_wp <- ggplot(data=nga_wp_derived, 
+             aes(x= nonfunc_wp)) +
+  geom_histogram(bins=20, 
+                 color="black", 
+                 fill="light blue")
+
+func_perc <- ggplot(data=nga_wp_derived, 
+             aes(x= func_perc)) +
+  geom_histogram(bins=20, 
+                 color="black", 
+                 fill="light blue")
+
+nonfunc_perc <- ggplot(data=nga_wp_derived, 
+             aes(x= nonfunc_perc)) +
+  geom_histogram(bins=20, 
+                 color="black", 
+                 fill="light blue")
+
+handpump_perc <- ggplot(data=nga_wp_derived, 
+             aes(x= handpump_perc)) +
+  geom_histogram(bins=20, 
+                 color="black", 
+                 fill="light blue")
+
+mechanized_perc <- ggplot(data=nga_wp_derived, 
+             aes(x= mechanized_perc)) +
+  geom_histogram(bins=20, 
+                 color="black", 
+                 fill="light blue")
+
+highusage_perc <- ggplot(data=nga_wp_derived, 
+             aes(x= highusage_perc)) +
+  geom_histogram(bins=20, 
+                 color="black", 
+                 fill="light blue")
+
+lowusage_perc <- ggplot(data=nga_wp_derived, 
+             aes(x= lowusage_perc)) +
+  geom_histogram(bins=20, 
+                 color="black", 
+                 fill="light blue")
+
+rural_perc <- ggplot(data=nga_wp_derived, 
+             aes(x= rural_perc)) +
+  geom_histogram(bins=20, 
+                 color="black", 
+                 fill="light blue")
+
+urban_perc <- ggplot(data=nga_wp_derived, 
+             aes(x= urban_perc)) +
+  geom_histogram(bins=20, 
+                 color="black", 
+                 fill="light blue")
+```
+
+```{r}
+ggarrange(func_wp, nonfunc_wp, func_perc, nonfunc_perc, handpump_perc,
+          mechanized_perc, highusage_perc, lowusage_perc, rural_perc, urban_perc,
+          ncol = 4, 
+          nrow = 3)
+```
+
+From the above, we can observe that `func_perc` and `nonfunc_perc` are more normally distributed compared to other variables.
+
+### EDA using choropleth map
+
+To have a quick look at the distribution of functional water points percentage of Nigeria at LGA level, a choropleth map will be prepared.
+
+The code chunk below is used to prepare the choropleth by using the *qtm()* function of **tmap** package.
+
+```{r}
+qtm(nga_wp_derived, "func_perc")
+```
+
+In order to reveal the distribution shown in the choropleth map above are biased towards the underlying number of functional water points at the LGAs, we will create two choropleth maps, one for the number of fucntional water points(i.e. `func.map`) and one for the percentage of functional water points (f`unc_perc.map`) by using the code chunk below.
+
+```{r}
+func.map <- tm_shape(nga_wp_derived) + 
+  tm_fill(col = "func_wp",
+          n = 5,
+          style = "jenks", 
+          title = "func_wp") + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(scale = 0.7)
+
+func_perc.map <- tm_shape(nga_wp_derived) + 
+  tm_fill(col = "func_perc",
+          n = 5,
+          style = "jenks",
+          title = "func_perc ") + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(scale = 0.7)
+
+tmap_arrange(func.map, func_perc.map,
+             asp=NA, ncol=2)
+```
+
+Notice that there are areas with high proportions of functional water points but the actual number of functional water points are low.
+
+```{r}
+nonfunc.map <- tm_shape(nga_wp_derived) + 
+  tm_fill(col = "nonfunc_wp",
+          n = 5,
+          style = "jenks", 
+          title = "nonfunc_wp") + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(scale = 0.7)
+
+nonfunc_perc.map <- tm_shape(nga_wp_derived) + 
+  tm_fill(col = "nonfunc_perc",
+          n = 5,
+          style = "jenks",
+          title = "nonfunc_perc ") + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(scale = 0.7)
+
+tmap_arrange(nonfunc.map, nonfunc_perc.map,
+             asp=NA, ncol=2)
+```
+
+The same observation also holds for non-functional water points aspect where there are high areas with high proportions of non-functional water points but the actual number of non-functional water points are low.
+
+## Correlation Analysis
+
+Before we perform cluster analysis, it is important for us to ensure that the cluster variables are not highly correlated. The code below uses [*corrplot.mixed()*](https://cran.r-project.org/web/packages/corrplot/corrplot.pdf) function of [**corrplot**](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html) package to visualise and analyse the correlation of the input variables.
+
+```{r}
+nga_wp_derived_new <- nga_wp_derived %>%
+  st_set_geometry(NULL)
+  
+cluster_vars.cor = cor(nga_wp_derived_new[, 4:11])
+corrplot.mixed(cluster_vars.cor,
+               lower = "ellipse", 
+               upper = "number",
+               tl.pos = "lt",
+               diag = "l",
+               tl.col = "black")
+```
+
+The correlation plot above shows that `mechanised_perc` and `highusage_perc` are highly correlated, and similar high correlation is also spotted in `handpump_perc` and `lowusage_perc`. This suggests that only one of them in each pair should be used in the cluster analysis instead of both.
