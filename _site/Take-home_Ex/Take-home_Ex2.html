@@ -186,6 +186,18 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#eda-using-choropleth-map" id="toc-eda-using-choropleth-map" class="nav-link" data-scroll-target="#eda-using-choropleth-map">EDA using choropleth map</a></li>
   </ul></li>
   <li><a href="#correlation-analysis" id="toc-correlation-analysis" class="nav-link" data-scroll-target="#correlation-analysis">Correlation Analysis</a></li>
+  <li><a href="#hierarchy-cluster-analysis" id="toc-hierarchy-cluster-analysis" class="nav-link" data-scroll-target="#hierarchy-cluster-analysis">Hierarchy Cluster Analysis</a>
+  <ul class="collapse">
+  <li><a href="#extracting-clustering-variables" id="toc-extracting-clustering-variables" class="nav-link" data-scroll-target="#extracting-clustering-variables">Extracting clustering variables</a></li>
+  <li><a href="#data-standardisation" id="toc-data-standardisation" class="nav-link" data-scroll-target="#data-standardisation">Data Standardisation</a></li>
+  <li><a href="#computing-proximity-matrix" id="toc-computing-proximity-matrix" class="nav-link" data-scroll-target="#computing-proximity-matrix">Computing proximity matrix</a></li>
+  <li><a href="#computing-hierarchical-clustering" id="toc-computing-hierarchical-clustering" class="nav-link" data-scroll-target="#computing-hierarchical-clustering">Computing hierarchical clustering</a></li>
+  <li><a href="#selecting-the-optimal-clustering-algorithm" id="toc-selecting-the-optimal-clustering-algorithm" class="nav-link" data-scroll-target="#selecting-the-optimal-clustering-algorithm">Selecting the optimal clustering algorithm</a></li>
+  <li><a href="#determining-optimal-clusters" id="toc-determining-optimal-clusters" class="nav-link" data-scroll-target="#determining-optimal-clusters">Determining Optimal Clusters</a></li>
+  <li><a href="#interpreting-the-dendrograms" id="toc-interpreting-the-dendrograms" class="nav-link" data-scroll-target="#interpreting-the-dendrograms">Interpreting the dendrograms</a></li>
+  <li><a href="#visually-driven-hierarchical-clustering-analysis" id="toc-visually-driven-hierarchical-clustering-analysis" class="nav-link" data-scroll-target="#visually-driven-hierarchical-clustering-analysis">Visually-driven hierarchical clustering analysis</a></li>
+  <li><a href="#mapping-the-clusters-formed" id="toc-mapping-the-clusters-formed" class="nav-link" data-scroll-target="#mapping-the-clusters-formed">Mapping the clusters formed</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -607,8 +619,221 @@ Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
 <p>The correlation plot above shows that <code>mechanised_perc</code> and <code>highusage_perc</code> are highly correlated, and similar high correlation is also spotted in <code>handpump_perc</code> and <code>lowusage_perc</code>. This suggests that only one of them in each pair should be used in the cluster analysis instead of both.</p>
+</section>
+<section id="hierarchy-cluster-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="hierarchy-cluster-analysis">Hierarchy Cluster Analysis</h2>
+<p>In this section, we will perform hierarchical cluster analysis.</p>
+<section id="extracting-clustering-variables" class="level3">
+<h3 class="anchored" data-anchor-id="extracting-clustering-variables">Extracting clustering variables</h3>
+<p>The code chunk below will be used to extract the clustering variables from <code>nga_wp_derived_new</code>.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>        shapeName func_perc nonfunc_perc handpump_perc mechanized_perc
+1       Aba North 0.4117647    0.5294118    0.11764706       0.8235294
+2       Aba South 0.4084507    0.4929577    0.09859155       0.8732394
+3          Abadam 0.0000000    0.0000000    0.00000000       0.0000000
+4           Abaji 0.4035088    0.5964912    0.40350877       0.5964912
+5            Abak 0.4791667    0.5208333    0.08333333       0.9166667
+6       Abakaliki 0.3519313    0.1802575    0.43776824       0.0944206
+7  Abeokuta North 0.4705882    0.4411765    0.14705882       0.7647059
+8  Abeokuta South 0.6050420    0.2773109    0.16806723       0.7058824
+9             Abi 0.5197368    0.4078947    0.59868421       0.3289474
+10    Aboh-Mbaise 0.2727273    0.3939394    0.01515152       0.6515152
+   rural_perc urban_perc
+1  0.00000000 1.00000000
+2  0.05633803 0.94366197
+3  0.00000000 0.00000000
+4  0.84210526 0.15789474
+5  0.83333333 0.16666667
+6  0.87553648 0.12446352
+7  0.20588235 0.79411765
+8  0.00000000 1.00000000
+9  0.95394737 0.04605263
+10 0.72727273 0.27272727</code></pre>
+</div>
+</div>
+<p>Notice that the final clustering variables list does not include variable <code>highusage_perc</code> and <code>lowusage_perc</code>because they are highly correlated with variable <code>mechanised_perc</code> and <code>handpump_perc</code> respectively.</p>
+<p>Next, we need to change the rows by LGA name instead of row number by using the code chunk below.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>                    shapeName func_perc nonfunc_perc handpump_perc
+Aba North           Aba North 0.4117647    0.5294118    0.11764706
+Aba South           Aba South 0.4084507    0.4929577    0.09859155
+Abadam                 Abadam 0.0000000    0.0000000    0.00000000
+Abaji                   Abaji 0.4035088    0.5964912    0.40350877
+Abak                     Abak 0.4791667    0.5208333    0.08333333
+Abakaliki           Abakaliki 0.3519313    0.1802575    0.43776824
+Abeokuta North Abeokuta North 0.4705882    0.4411765    0.14705882
+Abeokuta South Abeokuta South 0.6050420    0.2773109    0.16806723
+Abi                       Abi 0.5197368    0.4078947    0.59868421
+Aboh-Mbaise       Aboh-Mbaise 0.2727273    0.3939394    0.01515152
+               mechanized_perc rural_perc urban_perc
+Aba North            0.8235294 0.00000000 1.00000000
+Aba South            0.8732394 0.05633803 0.94366197
+Abadam               0.0000000 0.00000000 0.00000000
+Abaji                0.5964912 0.84210526 0.15789474
+Abak                 0.9166667 0.83333333 0.16666667
+Abakaliki            0.0944206 0.87553648 0.12446352
+Abeokuta North       0.7647059 0.20588235 0.79411765
+Abeokuta South       0.7058824 0.00000000 1.00000000
+Abi                  0.3289474 0.95394737 0.04605263
+Aboh-Mbaise          0.6515152 0.72727273 0.27272727</code></pre>
+</div>
+</div>
+<p>Notice that the row number has been replaced into the LGA name.</p>
+<p>Now, we will delete the <code>shapeName</code> field by using the code chunk below.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>               func_perc nonfunc_perc handpump_perc mechanized_perc rural_perc
+Aba North      0.4117647    0.5294118    0.11764706       0.8235294 0.00000000
+Aba South      0.4084507    0.4929577    0.09859155       0.8732394 0.05633803
+Abadam         0.0000000    0.0000000    0.00000000       0.0000000 0.00000000
+Abaji          0.4035088    0.5964912    0.40350877       0.5964912 0.84210526
+Abak           0.4791667    0.5208333    0.08333333       0.9166667 0.83333333
+Abakaliki      0.3519313    0.1802575    0.43776824       0.0944206 0.87553648
+Abeokuta North 0.4705882    0.4411765    0.14705882       0.7647059 0.20588235
+Abeokuta South 0.6050420    0.2773109    0.16806723       0.7058824 0.00000000
+Abi            0.5197368    0.4078947    0.59868421       0.3289474 0.95394737
+Aboh-Mbaise    0.2727273    0.3939394    0.01515152       0.6515152 0.72727273
+               urban_perc
+Aba North      1.00000000
+Aba South      0.94366197
+Abadam         0.00000000
+Abaji          0.15789474
+Abak           0.16666667
+Abakaliki      0.12446352
+Abeokuta North 0.79411765
+Abeokuta South 1.00000000
+Abi            0.04605263
+Aboh-Mbaise    0.27272727</code></pre>
+</div>
+</div>
+</section>
+<section id="data-standardisation" class="level3">
+<h3 class="anchored" data-anchor-id="data-standardisation">Data Standardisation</h3>
+<p>In order to avoid the cluster analysis result being biased towards clustering variables with large values, it is useful to standardise the input variables before performing cluster analysis.</p>
+<p>The code chunk below will be used to standardisation the clustering variables by using Z-score method.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>                vars   n mean sd median trimmed  mad   min  max range  skew
+func_perc          1 774    0  1  -0.10   -0.02 1.04 -2.06 2.07  4.13  0.14
+nonfunc_perc       2 774    0  1  -0.04   -0.03 1.05 -1.71 3.05  4.76  0.24
+handpump_perc      3 774    0  1   0.07    0.00 1.37 -1.49 1.57  3.06 -0.09
+mechanized_perc    4 774    0  1  -0.21   -0.09 1.05 -1.28 2.14  3.42  0.61
+rural_perc         5 774    0  1   0.42    0.17 0.62 -2.23 0.84  3.06 -1.12
+urban_perc         6 774    0  1  -0.44   -0.18 0.56 -0.82 2.37  3.19  1.19
+                kurtosis   se
+func_perc          -0.62 0.04
+nonfunc_perc       -0.45 0.04
+handpump_perc      -1.33 0.04
+mechanized_perc    -0.78 0.04
+rural_perc         -0.09 0.04
+urban_perc          0.16 0.04</code></pre>
+</div>
+</div>
+<p>Notice the mean and standard deviation of the Z-score standardised clustering variables are 0 and 1 respectively. We need to bear in mind that Z-score standardisation method should only be used if we would assume all variables come from some normal distribution.</p>
+</section>
+<section id="computing-proximity-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="computing-proximity-matrix">Computing proximity matrix</h3>
+<p>The code chunk below is used to compute the proximity matrix using <em>euclidean</em> method.</p>
+<div class="cell">
+
+</div>
+<p>The code chunk below can then be used to list the content of <code>proxmat</code> for visual inspection.</p>
+<div class="cell">
+
+</div>
+<p><img src="images/paste-305FA60D.png" class="img-fluid"></p>
+</section>
+<section id="computing-hierarchical-clustering" class="level3">
+<h3 class="anchored" data-anchor-id="computing-hierarchical-clustering">Computing hierarchical clustering</h3>
+<p>The code chunk below uses <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/hclust.html"><em>hclust()</em></a> of R stats to performs hierarchical cluster analysis via the <em>ward.D</em> method. The hierarchical clustering output is stored in an object of class <strong>hclust</strong> which describes the tree produced by the clustering process.</p>
+<div class="cell">
+
+</div>
+<p>We can then plot the tree by using <a href="https://www.rdocumentation.org/packages/ggdendro/versions/0.1.23/topics/ggdendrogram"><em>ggdendrogram()</em></a> of <strong>ggdendro</strong> package as shown in the code chunk below. <strong>Plotly</strong> has also been used here to add interactivity to the dendrogram so that we are able to zoom in and out easily.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="selecting-the-optimal-clustering-algorithm" class="level3">
+<h3 class="anchored" data-anchor-id="selecting-the-optimal-clustering-algorithm">Selecting the optimal clustering algorithm</h3>
+<p>The code chunk below will be used to compute the agglomerative coefficients of all hierarchical clustering algorithms.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>  average    single  complete      ward 
+0.9205714 0.8651966 0.9547781 0.9930765 </code></pre>
+</div>
+</div>
+<p>With reference to the output above, we can see that Ward’s method provides the strongest clustering structure among the four methods assessed. Hence, in the subsequent analysis, only Ward’s method will be used.</p>
+</section>
+<section id="determining-optimal-clusters" class="level3">
+<h3 class="anchored" data-anchor-id="determining-optimal-clusters">Determining Optimal Clusters</h3>
+<p>We will use the Gap Statistic Method to determine the optimal clusters to retain. To compute the gap statistic, <a href="https://www.rdocumentation.org/packages/cluster/versions/2.1.0/topics/clusGap"><em>clusGap()</em></a> of <a href="https://cran.r-project.org/web/packages/cluster/"><strong>cluster</strong></a> package will be used.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Clustering Gap statistic ["clusGap"] from call:
+clusGap(x = nga_wp_var, FUNcluster = hcut, K.max = 10, B = 50, nstart = 25)
+B=50 simulated reference sets, k = 1..10; spaceH0="scaledPCA"
+ --&gt; Number of clusters (method 'firstmax'): 10
+          logW   E.logW       gap      SE.sim
+ [1,] 5.173680 5.694269 0.5205892 0.008957162
+ [2,] 4.945917 5.565201 0.6192844 0.012576939
+ [3,] 4.786584 5.483159 0.6965752 0.009618580
+ [4,] 4.685945 5.415759 0.7298148 0.013337222
+ [5,] 4.629941 5.371421 0.7414807 0.011868180
+ [6,] 4.578270 5.333581 0.7553111 0.009754079
+ [7,] 4.525729 5.299502 0.7737736 0.009165408
+ [8,] 4.492775 5.270735 0.7779597 0.008911302
+ [9,] 4.455358 5.245195 0.7898374 0.008767538
+[10,] 4.429645 5.222057 0.7924118 0.008601505</code></pre>
+</div>
+</div>
+<p>Next, we can visualise the plot by using <a href="https://rpkgs.datanovia.com/factoextra/reference/fviz_nbclust.html"><em>fviz_gap_stat()</em></a> of <a href="https://rpkgs.datanovia.com/factoextra/"><strong>factoextra</strong></a> package.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Take-home_Ex2_files/figure-html/unnamed-chunk-43-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>From the output above, the optimal number of clusters is 4.</p>
+</section>
+<section id="interpreting-the-dendrograms" class="level3">
+<h3 class="anchored" data-anchor-id="interpreting-the-dendrograms">Interpreting the dendrograms</h3>
+<p>The code below uses <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/rect.hclust.html"><em>rect.hclust()</em></a> of R stats to add border colors for the rectangles.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Take-home_Ex2_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="visually-driven-hierarchical-clustering-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="visually-driven-hierarchical-clustering-analysis">Visually-driven hierarchical clustering analysis</h3>
+<p>We will perform visually-driven hierarchical clustering analysis by using <a href="https://cran.r-project.org/web/packages/heatmaply/"><strong>heatmaply</strong></a> package. In the code chunk below, the <a href="https://talgalili.github.io/heatmaply/reference/heatmaply.html"><em>heatmaply()</em></a> of <a href="https://talgalili.github.io/heatmaply/"><strong>heatmaply</strong></a> package is used to build an interactive cluster heatmap.</p>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+</section>
+<section id="mapping-the-clusters-formed" class="level3">
+<h3 class="anchored" data-anchor-id="mapping-the-clusters-formed">Mapping the clusters formed</h3>
+<p>In order to visualise the clusters, the code chunk below uses <em>qtm()</em> of <strong>tmap</strong> package is used to plot the choropleth map showing the cluster formed.</p>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Take-home_Ex2_files/figure-html/unnamed-chunk-49-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The choropleth map above reveals the clusters are very fragmented. The is one of the major limitation when non-spatial clustering algorithm such as hierarchical cluster analysis method is used.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

@@ -54,7 +54,10 @@ In this take-home exercise, we are required to regionalise Nigeria by using, but
 In the code chunk below, *p_load()* of **pacman** package is used to install and load the following R packages into R environment.
 
 ```{r}
-pacman::p_load(sf, tidyverse, tmap, spdep, ggpubr, corrplot)
+pacman::p_load(rgdal, spdep, tmap, sf, ClustGeo, 
+               ggpubr, cluster, factoextra, NbClust,
+               heatmaply, corrplot, psych, tidyverse,
+               plotly, ggdendro)
 ```
 
 ## The Data
@@ -495,3 +498,175 @@ corrplot.mixed(cluster_vars.cor,
 ```
 
 The correlation plot above shows that `mechanised_perc` and `highusage_perc` are highly correlated, and similar high correlation is also spotted in `handpump_perc` and `lowusage_perc`. This suggests that only one of them in each pair should be used in the cluster analysis instead of both.
+
+## Hierarchy Cluster Analysis
+
+In this section, we will perform hierarchical cluster analysis.
+
+### Extracting clustering variables
+
+The code chunk below will be used to extract the clustering variables from `nga_wp_derived_new`.
+
+```{r}
+cluster_vars <- nga_wp_derived_new %>%
+  select("shapeName", "func_perc", "nonfunc_perc", "handpump_perc", "mechanized_perc", "rural_perc", "urban_perc")
+head(cluster_vars, 10)
+```
+
+Notice that the final clustering variables list does not include variable `highusage_perc` and `lowusage_perc`because they are highly correlated with variable `mechanised_perc` and `handpump_perc` respectively.
+
+Next, we need to change the rows by LGA name instead of row number by using the code chunk below.
+
+```{r}
+row.names(cluster_vars) <- cluster_vars$"shapeName"
+head(cluster_vars,10)
+```
+
+Notice that the row number has been replaced into the LGA name.
+
+Now, we will delete the `shapeName` field by using the code chunk below.
+
+```{r}
+nga_wp_var <- select(cluster_vars, c(2:7))
+head(nga_wp_var, 10)
+```
+
+### Data Standardisation
+
+In order to avoid the cluster analysis result being biased towards clustering variables with large values, it is useful to standardise the input variables before performing cluster analysis.
+
+The code chunk below will be used to standardisation the clustering variables by using Z-score method.
+
+```{r}
+nga_wp_var.z <- scale(nga_wp_var)
+describe(nga_wp_var.z)
+```
+
+Notice the mean and standard deviation of the Z-score standardised clustering variables are 0 and 1 respectively. We need to bear in mind that Z-score standardisation method should only be used if we would assume all variables come from some normal distribution.
+
+### Computing proximity matrix
+
+The code chunk below is used to compute the proximity matrix using *euclidean* method.
+
+```{r}
+proxmat <- dist(nga_wp_var, method = 'euclidean')
+```
+
+The code chunk below can then be used to list the content of `proxmat` for visual inspection.
+
+```{r}
+#| eval: false
+proxmat
+```
+
+![](images/paste-305FA60D.png)
+
+### Computing hierarchical clustering
+
+The code chunk below uses [*hclust()*](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/hclust.html) of R stats to performs hierarchical cluster analysis via the *ward.D* method. The hierarchical clustering output is stored in an object of class **hclust** which describes the tree produced by the clustering process.
+
+```{r}
+hclust_ward <- hclust(proxmat, method = 'ward.D')
+```
+
+We can then plot the tree by using [*ggdendrogram()*](https://www.rdocumentation.org/packages/ggdendro/versions/0.1.23/topics/ggdendrogram) of **ggdendro** package as shown in the code chunk below. **Plotly** has also been used here to add interactivity to the dendrogram so that we are able to zoom in and out easily.
+
+```{r}
+# p <- ggdendrogram(hclust_ward, rotate = FALSE)
+# ggplotly(p)
+```
+
+### Selecting the optimal clustering algorithm
+
+The code chunk below will be used to compute the agglomerative coefficients of all hierarchical clustering algorithms.
+
+```{r}
+m <- c( "average", "single", "complete", "ward")
+names(m) <- c( "average", "single", "complete", "ward")
+
+ac <- function(x) {
+  agnes(nga_wp_var, method = x)$ac
+}
+
+map_dbl(m, ac)
+```
+
+With reference to the output above, we can see that Ward's method provides the strongest clustering structure among the four methods assessed. Hence, in the subsequent analysis, only Ward's method will be used.
+
+### Determining Optimal Clusters
+
+We will use the Gap Statistic Method to determine the optimal clusters to retain. To compute the gap statistic, [*clusGap()*](https://www.rdocumentation.org/packages/cluster/versions/2.1.0/topics/clusGap) of [**cluster**](https://cran.r-project.org/web/packages/cluster/) package will be used.
+
+```{r}
+set.seed(12345)
+gap_stat <- clusGap(nga_wp_var, 
+                    FUN = hcut, 
+                    nstart = 25, 
+                    K.max = 10, 
+                    B = 50)
+# Print the result
+print(gap_stat, method = "firstmax")
+```
+
+Next, we can visualise the plot by using [*fviz_gap_stat()*](https://rpkgs.datanovia.com/factoextra/reference/fviz_nbclust.html) of [**factoextra**](https://rpkgs.datanovia.com/factoextra/) package.
+
+```{r}
+fviz_gap_stat(gap_stat)
+```
+
+From the output above, the optimal number of clusters is 4.
+
+### Interpreting the dendrograms
+
+The code below uses [*rect.hclust()*](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/rect.hclust.html) of R stats to add border colors for the rectangles.
+
+```{r}
+plot(hclust_ward, cex = 0.1)
+rect.hclust(hclust_ward, 
+            k = 4, 
+            border = 2:5)
+```
+
+### Visually-driven hierarchical clustering analysis
+
+We will perform visually-driven hierarchical clustering analysis by using [**heatmaply**](https://cran.r-project.org/web/packages/heatmaply/) package. In the code chunk below, the [*heatmaply()*](https://talgalili.github.io/heatmaply/reference/heatmaply.html) of [**heatmaply**](https://talgalili.github.io/heatmaply/) package is used to build an interactive cluster heatmap.
+
+```{r}
+nga_wp_var_mat <- data.matrix(nga_wp_var)
+```
+
+```{r}
+# heatmaply(normalize(nga_wp_var_mat),
+#           Colv=NA,
+#           dist_method = "euclidean",
+#           hclust_method = "ward.D",
+#           seriate = "OLO",
+#           colors = Blues,
+#           k_row = 4,
+#           margins = c(NA,200,60,NA),
+#           fontsize_row = 4,
+#           fontsize_col = 5,
+#           main="Geographic Segmentation of LGA by Cluster Variables",
+#           xlab = "Cluster Variables",
+#           ylab = "LGAs of Nigeria"
+#           )
+```
+
+### Mapping the clusters formed
+
+In order to visualise the clusters, the code chunk below uses *qtm()* of **tmap** package is used to plot the choropleth map showing the cluster formed.
+
+```{r}
+groups <- as.factor(cutree(hclust_ward, k=4))
+```
+
+```{r}
+nga_wp_cluster <- cbind(nga, as.matrix(groups)) %>%
+  rename(`CLUSTER`=`as.matrix.groups.`)
+```
+
+```{r}
+qtm(nga_wp_cluster, "CLUSTER")
+```
+
+The choropleth map above reveals the clusters are very fragmented. The is one of the major limitation when non-spatial clustering algorithm such as hierarchical cluster analysis method is used.
