@@ -524,7 +524,9 @@ The code chunk below can then be used to list the content of `proxmat` for visua
 proxmat
 ```
 
-### ![](images/paste-362123A7.png)Computing hierarchical clustering
+### ![](images/paste-362123A7.png)
+
+### Computing hierarchical clustering
 
 The code chunk below uses [*hclust()*](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/hclust.html) of R stats to performs hierarchical cluster analysis via the *ward.D* method. The hierarchical clustering output is stored in an object of class **hclust** which describes the tree produced by the clustering process.
 
@@ -679,7 +681,7 @@ summary(nga_wp.nb)
 
 #### Calculating edge costs
 
-The code chunk below uses [*nbcosts()*](https://r-spatial.github.io/spdep/reference/nbcosts.html) of **spdep** package to compute the cost of each edge which is the distance between nodes.
+The code chunk below uses [*nbcosts()*](https://r-spatial.github.io/spdep/reference/nbcosts.html) of **spdep** package to compute the cost of each edge, which is the distance between nodes.
 
 ```{r}
 lcosts <- nbcosts(nga_wp.nb, nga_wp_var_v2)
