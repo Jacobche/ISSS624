@@ -537,7 +537,7 @@ hclust_ward <- hclust(proxmat, method = 'ward.D')
 We can then plot the tree by using [*ggdendrogram()*](https://www.rdocumentation.org/packages/ggdendro/versions/0.1.23/topics/ggdendrogram) of **ggdendro** package as shown in the code chunk below. **Plotly** has also been used here to add interactivity to the dendrogram so that we are able to zoom in and out easily.
 
 ```{r}
-p <- ggdendrogram(hclust_ward, rotate = FALSE)
+p <- ggdendrogram(hclust_ward, rotate = FALSE, size = 0.1)
 
 ggplotly(p) %>%
   partial_bundle()
