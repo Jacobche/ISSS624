@@ -524,7 +524,7 @@ The code chunk below can then be used to list the content of `proxmat` for visua
 proxmat
 ```
 
-### ![](images/paste-362123A7.png)
+![](images/paste-6DB314C7.png)
 
 ### Computing hierarchical clustering
 
@@ -538,7 +538,9 @@ We can then plot the tree by using [*ggdendrogram()*](https://www.rdocumentation
 
 ```{r}
 p <- ggdendrogram(hclust_ward, rotate = FALSE)
-ggplotly(p)
+
+ggplotly(p) %>%
+  partial_bundle()
 ```
 
 ### Selecting the optimal clustering algorithm
