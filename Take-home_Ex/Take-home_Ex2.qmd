@@ -55,8 +55,7 @@ In the code chunk below, *p_load()* of **pacman** package is used to install and
 ```{r}
 pacman::p_load(rgdal, spdep, tmap, sf, ClustGeo, 
                ggpubr, cluster, factoextra, NbClust,
-               heatmaply, corrplot, psych, tidyverse,
-               plotly, ggdendro, GGally)
+               heatmaply, corrplot, psych, tidyverse, GGally)
 ```
 
 ## The Data
@@ -534,13 +533,10 @@ The code chunk below uses [*hclust()*](https://stat.ethz.ch/R-manual/R-devel/lib
 hclust_ward <- hclust(proxmat, method = 'ward.D')
 ```
 
-We can then plot the tree by using [*ggdendrogram()*](https://www.rdocumentation.org/packages/ggdendro/versions/0.1.23/topics/ggdendrogram) of **ggdendro** package as shown in the code chunk below. **Plotly** has also been used here to add interactivity to the dendrogram so that we are able to zoom in and out easily.
+We can then plot the tree by using *plot()* of R Graphics as shown in the code chunk below.
 
 ```{r}
-p <- ggdendrogram(hclust_ward, rotate = FALSE, size = 0.1)
-
-ggplotly(p) %>%
-  partial_bundle()
+plot(hclust_ward, cex = 0.1)
 ```
 
 ### Selecting the optimal clustering algorithm
