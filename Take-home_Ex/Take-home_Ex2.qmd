@@ -861,7 +861,7 @@ ggplot(data = nga_wp_sf_Gcluster,
   geom_boxplot()
 ```
 
-The boxplot reveals Cluster 3 displays the highest mean percentage of functional water points. This is followed by Cluster 1, 2 and 4.
+The boxplot reveals Cluster 3 displays the highest mean percentage of functional water points. This is followed by Cluster 1, 4 and 2.
 
 ### Multivariate Visualisation
 
