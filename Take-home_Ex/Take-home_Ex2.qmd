@@ -50,12 +50,38 @@ In this take-home exercise, we are required to regionalise Nigeria by using, but
 
 ## Installing & Loading R Packages
 
+The R packages needed for this exercise are as follows:
+
+-   Spatial data handling
+
+    -   **sf**, **rgdal** and **spdep**
+
+-   Attribute data handling
+
+    -   **tidyverse**, especially **readr**, **ggplot2** and **dplyr**
+
+-   Choropleth mapping
+
+    -   **tmap**
+
+-   Multivariate data visualisation and analysis
+
+    -   **corrplot**, **ggpubr**, **heatmaply** and **GGally**
+
+-   Cluster analysis
+
+    -   **cluster**
+
+    -   **ClustGeo**
+
+    -   **factoextra**
+
 In the code chunk below, *p_load()* of **pacman** package is used to install and load the following R packages into R environment.
 
 ```{r}
-pacman::p_load(rgdal, spdep, tmap, sf, ClustGeo, 
-               ggpubr, cluster, factoextra, NbClust,
-               heatmaply, corrplot, psych, tidyverse, GGally)
+pacman::p_load(rgdal, spdep, tmap, sf, ClustGeo,
+               ggpubr, cluster, factoextra,
+               heatmaply, corrplot, tidyverse, GGally)
 ```
 
 ## The Data
@@ -409,6 +435,8 @@ urban_perc <- ggplot(data=nga_wp_derived,
 ```
 
 ```{r}
+#| fig-width: 14
+#| fig-height: 12
 ggarrange(func_wp, nonfunc_wp, func_perc, nonfunc_perc, handpump_perc,
           mechanized_perc, highusage_perc, lowusage_perc, rural_perc, urban_perc,
           ncol = 4, 
@@ -457,6 +485,8 @@ Notice that there are areas with high proportions of functional water points but
 Before we perform cluster analysis, it is important for us to ensure that the cluster variables are not highly correlated. The code below uses [*corrplot.mixed()*](https://cran.r-project.org/web/packages/corrplot/corrplot.pdf) function of [**corrplot**](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html) package to visualise and analyse the correlation of the input variables.
 
 ```{r}
+#| fig-width: 8
+#| fig-height: 8
 nga_wp_derived_new <- nga_wp_derived %>%
   st_set_geometry(NULL)
   
@@ -469,7 +499,7 @@ corrplot.mixed(cluster_vars.cor,
                tl.col = "black")
 ```
 
-The correlation plot above shows that `mechanised_perc` and `highusage_perc` are highly correlated, and similar high correlation is also spotted in `handpump_perc` and `lowusage_perc`. This suggests that only one of them in each pair should be used in the cluster analysis instead of both.
+The correlation plot above shows that many pairs of variables are correlated, both in positive and negative sense. We will keep only one of them in each pair for the cluster analysis later.
 
 ## Conventional Hierarchy Cluster Analysis
 
@@ -479,18 +509,18 @@ The code chunk below will be used to extract the clustering variables from `nga_
 
 ```{r}
 cluster_vars <- nga_wp_derived_new %>%
-  select("shapeName", "func_wp", "nonfunc_wp","func_perc", "nonfunc_perc", "handpump_perc", "mechanized_perc", "rural_perc", "urban_perc")
+  select("shapeName", "func_wp", "nonfunc_wp","func_perc", "nonfunc_perc", "handpump_perc", "rural_perc")
 head(cluster_vars, 10)
 ```
 
-Notice that the final clustering variables list does not include variable `highusage_perc` and `lowusage_perc`because they are highly correlated with variable `mechanised_perc` and `handpump_perc` respectively.
+Notice that the final clustering variables list does not include variable `highusage_perc` ,`lowusage_perc` , `mechanized_perc` and `urban_perc` due to the high correlation spotted.
 
 Next, we need to change the rows by LGA name instead of row number by using the code chunk below.
 
 ```{r}
 row.names(cluster_vars) <- cluster_vars$"shapeName"
 
-nga_wp_var <- select(cluster_vars, c(2:9))
+nga_wp_var <- select(cluster_vars, c(2:7))
 head(nga_wp_var, 10)
 
 ```
@@ -536,6 +566,8 @@ hclust_ward <- hclust(proxmat, method = 'ward.D')
 We can then plot the tree by using *plot()* of R Graphics as shown in the code chunk below.
 
 ```{r}
+#| fig-width: 16
+#| fig-height: 8
 plot(hclust_ward, cex = 0.1)
 ```
 
@@ -584,6 +616,8 @@ From the output above, the optimal number of clusters is 4.
 The code below uses [*rect.hclust()*](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/rect.hclust.html) of R stats to add border colors for the rectangles.
 
 ```{r}
+#| fig-width: 16
+#| fig-height: 8
 plot(hclust_ward, cex = 0.1)
 rect.hclust(hclust_ward, 
             k = 4, 
@@ -599,6 +633,8 @@ nga_wp_var_mat <- data.matrix(nga_wp_var.std)
 ```
 
 ```{r}
+#| fig-width: 16
+#| fig-height: 14
 heatmaply(normalize(nga_wp_var_mat),
           Colv=NA,
           dist_method = "euclidean",
@@ -651,6 +687,8 @@ summary(nga_wp.nb)
 ```
 
 ```{r}
+#| fig-width: 8
+#| fig-height: 8
 plot(nga_wp_sp, 
      border=grey(.5))
 plot(nga_wp.nb, 
@@ -715,6 +753,8 @@ head(nga_wp.mst)
 The plot method for the MST includes a way to show the observation numbers of the nodes in addition to the edge. As before, we plot this together with the LGA boundaries. We can see how the initial neighbour list is simplified to just one edge connecting each of the nodes, while passing through all the nodes.
 
 ```{r}
+#| fig-width: 12
+#| fig-height: 10
 plot(nga_wp_sp_v2, border=gray(.5))
 plot.mst(nga_wp.mst, 
          coordinates(nga_wp_sp_v2), 
@@ -751,6 +791,8 @@ table(ccs4)
 We can now plot the pruned tree that shows the 4 clusters on top of the LGA area.
 
 ```{r}
+#| fig-width: 12
+#| fig-height: 10
 plot(nga_wp_sp_v2, border=gray(.5))
 plot(clust4, 
      coordinates(nga_wp_sp_v2), 
@@ -780,16 +822,16 @@ dist <- st_distance(nga_wp_derived, nga_wp_derived)
 distmat <- as.dist(dist)
 ```
 
-Next, *choicealpha()* will be used to determine a suitable value for the mixing parameter alpha as shown in the code chunk below.
+Next, *choicealpha()* of **ClustGeo** package will be used to determine a suitable value for the mixing parameter alpha as shown in the code chunk below.
 
 ```{r}
 cr <- choicealpha(proxmat, distmat, range.alpha = seq(0, 1, 0.1), K=4, graph = TRUE)
 ```
 
-With reference to the graphs above, alpha = 0.4 will be used as shown in the code chunk below.
+With reference to the graphs above, alpha = 0.5 will be used as shown in the code chunk below.
 
 ```{r}
-clustG <- hclustgeo(proxmat, distmat, alpha = 0.4)
+clustG <- hclustgeo(proxmat, distmat, alpha = 0.5)
 ```
 
 ```{r}
@@ -819,15 +861,17 @@ ggplot(data = nga_wp_sf_Gcluster,
   geom_boxplot()
 ```
 
-The boxplot reveals Cluster 2 displays the highest mean percentage of functional water points. This is followed by Cluster 1, 3 and 4.
+The boxplot reveals Cluster 3 displays the highest mean percentage of functional water points. This is followed by Cluster 1, 2 and 4.
 
 ### Multivariate Visualisation
 
 The code chunk below uses [*ggparcoord()*](https://ggobi.github.io/ggally/reference/ggparcoord.html) of [**GGally**](https://ggobi.github.io/ggally/) package to display a parallel coordinate plot that can be used to reveal clustering variables by cluster very effectively.
 
 ```{r}
+#| fig-width: 14
+#| fig-height: 8
 ggparcoord(data = nga_wp_sf_Gcluster, 
-           columns = c(4:11), 
+           columns = c(4:6, 10), 
            scale = "globalminmax",
            alphaLines = 0.1,
            boxplot = TRUE, 
@@ -838,4 +882,4 @@ ggparcoord(data = nga_wp_sf_Gcluster,
   scale_color_viridis(option = "C", discrete=TRUE)
 ```
 
-From the above, we can infer that Cluster 2 consists of LGAs which are mostly in rural areas having functional water points which are characterised by hand pump technology and low usage capacity. This may suggest this Cluster consists of LGAs which are mainly specialised in farming.
+From the above, we can infer that Cluster 3 consists of LGAs having higher average of `func_perc`, `handpump_perc` and `rural_perc`. This may suggest this Cluster consists of LGAs which are predominantly specialised in farming with abundant functional water points.
