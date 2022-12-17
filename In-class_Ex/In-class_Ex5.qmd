@@ -97,6 +97,8 @@ Osun_wp_sf %>%
 
 Note that some of the independent variables have many missing records, for example `install_year` has as many as 1144 records missing. Whereas some of the independent variables only have a few missing records, for example `water_point_population` and `local_population_1km` only have 4 records missing respectively.
 
+The code chunk below is used to remove rows of those missing values from the independent variables.
+
 ```{r}
 Osun_wp_sf_clean <- Osun_wp_sf %>%
   filter_at(vars(status,
@@ -115,6 +117,8 @@ Osun_wp_sf_clean <- Osun_wp_sf %>%
 ```
 
 ## Correlation Analysis
+
+The code chunk below is used to display a correlation plot of the independent variables.
 
 ```{r}
 Osun_wp <- Osun_wp_sf_clean %>%
@@ -169,7 +173,36 @@ In the code chunk below, [*blr_confusion_matrix()*](https://blorr.rsquaredacadem
 blr_confusion_matrix(model, cutoff = 0.5)
 ```
 
-From the output, the overall accuracy of the Logistic Regression Model is 0.6739 while the True Positive (0.7207) is greater than the True Negative (0.6154).
+From the output, the overall Accuracy of the Logistic Regression Model is 0.6739 while the True Positive (0.7207) is greater than the True Negative (0.6154).
+
+### Building Logistic Regression Model - Excluding 2 variables
+
+The code chunk below is used to compute the confusion matrix of the estimated outcomes for the LR model excluding 2 variables.
+
+```{r}
+#| echo: false
+model_1 <- glm(status ~ distance_to_tertiary_road +
+               distance_to_city +
+               distance_to_town +
+               is_urban +
+               usage_capacity +
+               water_source_clean +
+               water_point_population +
+               local_population_1km,
+             data = Osun_wp_sf_clean,
+             family = binomial(link = 'logit'))
+```
+
+```{r}
+#| echo: false
+blr_regress(model_1)
+```
+
+```{r}
+blr_confusion_matrix(model_1, cutoff = 0.5)
+```
+
+From the output, this LR model has a slightly worse Accuracy of 0.6726 compared to that of the LR model with all variables included (0.6739). This is the common behaviour of the regression models that the model performance will be compromised when an independent variable is removed. In this case, since the difference in Accuracy is very minimal, we can conclude that the performance of the LR model is not really impacted when two independent variables are excluded.
 
 ## Building Geographically Weighted Logistic Regression (GWLR) Models
 
@@ -269,6 +302,90 @@ CM
 
 The overall Accuracy now improves to 0.8837, meaning that the GWLR Model geographically managed to improve greatly, from the LR's Accuracy of 0.6739. Sensitivity and Specificity also improved to 0.8628 and 0.9005 respectively.
 
+### Building Geographically Weighted Logistic Regression Model - Excluding 2 variables
+
+The code chunk below is used to compute the confusion matrix of the estimated outcomes for the GWLR model excluding 2 variables.
+
+```{r}
+#| echo: false
+Osun_wp_sp_1 <- Osun_wp_sf_clean %>%
+  select(c(status,
+           distance_to_tertiary_road,
+           distance_to_city,
+           distance_to_town,
+           water_point_population,
+           local_population_1km,
+           usage_capacity,
+           is_urban,
+           water_source_clean)) %>%
+  as_Spatial()
+Osun_wp_sp_1
+```
+
+```{r}
+#| echo: false
+#| eval: false
+bw.fixed_1 <- bw.ggwr(status ~ distance_to_tertiary_road +
+                      distance_to_city +
+                      distance_to_town +
+                      is_urban +
+                      usage_capacity +
+                      water_source_clean +
+                      water_point_population +
+                      local_population_1km,
+                    data = Osun_wp_sp_1,
+                    family = "binomial",
+                    approach = "AIC",
+                    kernel = "gaussian",
+                    adaptive = FALSE,
+                    longlat = FALSE)
+```
+
+```{r}
+#| echo: false
+#| eval: false
+bw.fixed_1
+```
+
+```{r}
+#| echo: false
+gwlr.fixed_1 <- ggwr.basic(status ~ distance_to_tertiary_road +
+                           distance_to_city +
+                           distance_to_town +
+                           is_urban +
+                           usage_capacity +
+                           water_source_clean +
+                           water_point_population +
+                           local_population_1km,
+                         data = Osun_wp_sp_1,
+                         bw = 2377.371,
+                         family = "binomial",
+                         kernel = "gaussian",
+                         adaptive = FALSE,
+                         longlat = FALSE)
+```
+
+```{r}
+#| echo: false
+gwr.fixed_1 <- as.data.frame(gwlr.fixed_1$SDF)
+```
+
+```{r}
+#| echo: false
+gwr.fixed_1 <- gwr.fixed_1 %>%
+  mutate(most = ifelse(
+    gwr.fixed_1$yhat >= 0.5, T, F))
+```
+
+```{r}
+gwr.fixed_1$y <- as.factor(gwr.fixed_1$y)
+gwr.fixed_1$most <- as.factor(gwr.fixed_1$most)
+CM_1 <- confusionMatrix(data = gwr.fixed_1$most, reference = gwr.fixed_1$y)
+CM_1
+```
+
+From the output, this GWLR model has a slightly better Accuracy of 0.8846 compared to that of the GWLR model with all variables included (0.8837). However since the difference in Accuracy is very minimal, we can conclude that the performance of the GWLR model is also not really impacted when two independent variables are excluded.
+
 ### Visualising GWLR
 
 ```{r}
@@ -301,5 +418,3 @@ tmap_mode("plot")
 ```
 
 Those darker coloured points represent the functional water points which predict the functional ones better than the non-functional ones. Whereas the light coloured points represent the non-functional ones which predict the non-functional ones better than the functional ones.
-
-**exclude the 2 variables and rerun all models again to see if still get consistent result!!! calibrate bandwidth again...**
